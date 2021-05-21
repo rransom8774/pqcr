@@ -1,0 +1,13 @@
+
+Copied out of pkpsig-c-impl commit 5ad1cfc5261d4bb5d35db56b8b42173510d5704f
+and tweaked as follows:
+
+# Files from include/pkpsig/ were moved to this directory.
+
+# Files with .c extensions from src/ were renamed to start with: pkps-
+
+sed -E -i -e 's|<pkpsig/(.*\.h)>|"\1"|' pkpsig/*
+
+# pkps-randombytes.c was rewritten to call out to the routines in
+# PuTTY's sshrand.c .
+
