@@ -24,8 +24,6 @@
 const struct pkpsig_symmetric_algo *pkpsig_symmetric_algo_get(const char *name) {
   if (strcmp(name, "shake256") == 0) {
     return pkpsig_symmetric_algo_get_shake256();
-  } else if (strcmp(name, "xoodyak") == 0) {
-    return pkpsig_symmetric_algo_get_xoodyak();
   } else {
     return NULL;
   };

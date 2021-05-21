@@ -31,7 +31,6 @@ struct pkpsig_symmetric_algo {
 };
 
 const struct pkpsig_symmetric_algo *pkpsig_symmetric_algo_get_shake256();
-const struct pkpsig_symmetric_algo *pkpsig_symmetric_algo_get_xoodyak();
 
 void pkpsig_scratch_store_set_prefix(struct pkpsig_scratch_store *st);
 void pkpsig_scratch_store_use_prefix(struct pkpsig_scratch_store *st);
