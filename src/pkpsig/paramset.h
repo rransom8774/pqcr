@@ -13,7 +13,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <pkpsig/modulo.h>
+#include "modulo.h"
 
 struct pkpsig_seclevel {
   const char *name;
