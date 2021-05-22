@@ -2,20 +2,23 @@
 
 rm testvec-hashes.txt
 
-for keyparams in q797n55m25kc1a q977n61m28kc2 q1409n87m42kc4 q1789n111m55kc5 q1789n111m55kc6
+for sigfmt in '' '-u' '-m'
 do
-    for symalg in shake256
+    for keyparams in q797n55m25kc1a q977n61m28kc2 q1409n87m42kc4 q1789n111m55kc5 q1789n111m55kc6
     do
-	for sigseclevel in sb80 sb96 sb112git sb112 sc1 sc1a sc2 sc3 sc4 sc5 sc6
+	for symalg in shake256
 	do
-	    echo "${keyparams} ${symalg} ${sigseclevel}"
-	    if test -e "out/testvecs/pkpsig/testvec-${keyparams}-${symalg}-${sigseclevel}-0.bin"
-	    then
-		for i in $(seq 0 9)
-		do
-		    sha256sum "out/testvecs/pkpsig/testvec-${keyparams}-${symalg}-${sigseclevel}-${i}.bin" |tee -a testvec-hashes.txt
-		done
-	    fi
+	    for sigseclevel in sb80 sb96 sb112git sb112 sc1 sc1a sc2 sc3 sc4 sc5 sc6
+	    do
+		echo "${keyparams} ${symalg} ${sigseclevel}"
+		if test -e "out/testvecs/pkpsig/testvec-${keyparams}-${symalg}-${sigseclevel}-0.bin"
+		then
+		    for i in $(seq 0 9)
+		    do
+			sha256sum "out/testvecs/pkpsig/testvec-${keyparams}-${symalg}-${sigseclevel}${sigfmt}-${i}.bin" |tee -a testvec-hashes.txt
+		    done
+		fi
+	    done
 	done
     done
 done
