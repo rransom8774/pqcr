@@ -78,11 +78,11 @@ OBJS_LIB = \
 
 
 HEADERS_GEN_TEST_VECS = \
-	src/test/rng.h \
+	src/test/randombytes_shake256_deterministic.h \
 
 OBJS_GEN_TEST_VECS = \
-	out/test/PQCgenKAT_sign.o \
-	out/test/rng.o \
+	out/test/generate-test-vectors.o \
+	out/test/randombytes_shake256_deterministic.o \
 
 
 TESTPROGS = \
@@ -99,10 +99,10 @@ build-dirs:
 out/test/generate-test-vectors: $(OBJS_GEN_TEST_VECS) $(OBJS_LIB)
 	$(CC) -o $@ $+ $(LIBS_TEST)
 
-out/test/rng.o: src/test/rng.c $(HEADERS_GEN_TEST_VECS)
+out/test/randombytes_shake256_deterministic.o: src/test/randombytes_shake256_deterministic.c $(HEADERS_GEN_TEST_VECS)
 	$(CC) -c -o $@ $(CFLAGS_TEST) $<
 
-out/test/PQCgenKAT_sign.o: src/test/PQCgenKAT_sign.c $(HEADERS_GEN_TEST_VECS)
+out/test/generate-test-vectors.o: src/test/generate-test-vectors.c $(HEADERS_GEN_TEST_VECS) $(HEADERS_LIB)
 	$(CC) -c -o $@ $(CFLAGS_TEST) $<
 
 

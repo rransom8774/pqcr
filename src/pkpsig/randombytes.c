@@ -10,9 +10,8 @@
 
 #include "randombytes.h"
 
-/* copied from NIST rng.h for test purposes */
-int
-randombytes(unsigned char *x, unsigned long long xlen);
+/* copied from randombytes_shake256_deterministic.h for test purposes */
+int randombytes(uint8_t *out, size_t len);
 
 int pkpsig_randombytes(uint8_t *out, size_t len) {
     randombytes(out, len);
