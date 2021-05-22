@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 
 for keyparams in q797n55m25kc1a q977n61m28kc2 q1409n87m42kc4 q1789n111m55kc5 q1789n111m55kc6
 do
