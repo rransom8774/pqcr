@@ -63,11 +63,10 @@ static const struct pkpsig_keyfmt keyfmts[N_KEYFMTS] =
   };
 
 enum paramset_enum {
-#define DEFINE_PARAMSET(KF,Q,N,M,KSL,SSL,SYM,NRS,NRL)	\
-  PARAMSET_q##Q##n##N##m##M##k##KSL##s##SSL##SYM,	\
-  PARAMSET_q##Q##n##N##m##M##k##KSL##s##SSL##SYM##s,	\
-  PARAMSET_q##Q##n##N##m##M##k##KSL##s##SSL##SYM##m,	\
-  PARAMSET_q##Q##n##N##m##M##k##KSL##s##SSL##SYM##sm,
+#define DEFINE_PARAMSET(KF,Q,N,M,KSL,SSL,SYM,NRS,NRL)		\
+  PARAMSET_q##Q##n##N##m##M##k##KSL##_##SYM##_s##SSL,		\
+  PARAMSET_q##Q##n##N##m##M##k##KSL##_##SYM##_s##SSL##_u,	\
+  PARAMSET_q##Q##n##N##m##M##k##KSL##_##SYM##_s##SSL##_m,
 #include "paramset_list.h"
 #undef DEFINE_PARAMSET
   N_PARAMSETS
@@ -197,19 +196,8 @@ void pkpsig_paramset_init() {
 #undef INIT_PKP_PARAM_SET
 
 #define DEFINE_PARAMSET(KF,Q,N,M,KSL,SSL,SYM,NRS,NRL)			\
-  init_paramset("q" #Q "n" #N "m" #M "k" #KSL "s" #SSL #SYM "",		\
-		PARAMSET_q##Q##n##N##m##M##k##KSL##s##SSL##SYM,		\
-		PKP_PARAM_SET_q##Q##n##N##m##M,				\
-		KEYFMT_##KF,						\
-		0,							\
-		0,							\
-		#KSL,							\
-		#SSL,							\
-		#SYM,							\
-		NRS,							\
-		NRL);							\
-  init_paramset("q" #Q "n" #N "m" #M "k" #KSL "s" #SSL #SYM "s",	\
-		PARAMSET_q##Q##n##N##m##M##k##KSL##s##SSL##SYM##s,	\
+  init_paramset("q" #Q "n" #N "m" #M "k" #KSL "-" #SYM "-s" #SSL,		\
+		PARAMSET_q##Q##n##N##m##M##k##KSL##_##SYM##_s##SSL,	\
 		PKP_PARAM_SET_q##Q##n##N##m##M,				\
 		KEYFMT_##KF,						\
 		1,							\
@@ -219,19 +207,19 @@ void pkpsig_paramset_init() {
 		#SYM,							\
 		NRS,							\
 		NRL);							\
-  init_paramset("q" #Q "n" #N "m" #M "k" #KSL "s" #SSL #SYM "m",	\
-		PARAMSET_q##Q##n##N##m##M##k##KSL##s##SSL##SYM##m,	\
+  init_paramset("q" #Q "n" #N "m" #M "k" #KSL "-" #SYM "-s" #SSL "-u",	\
+		PARAMSET_q##Q##n##N##m##M##k##KSL##_##SYM##_s##SSL##_u,	\
 		PKP_PARAM_SET_q##Q##n##N##m##M,				\
 		KEYFMT_##KF,						\
 		0,							\
-		1,							\
+		0,							\
 		#KSL,							\
 		#SSL,							\
 		#SYM,							\
 		NRS,							\
 		NRL);							\
-  init_paramset("q" #Q "n" #N "m" #M "k" #KSL "s" #SSL #SYM "sm",	\
-		PARAMSET_q##Q##n##N##m##M##k##KSL##s##SSL##SYM##sm,	\
+  init_paramset("q" #Q "n" #N "m" #M "k" #KSL "-" #SYM "-s" #SSL "-m",	\
+		PARAMSET_q##Q##n##N##m##M##k##KSL##_##SYM##_s##SSL##_m,	\
 		PKP_PARAM_SET_q##Q##n##N##m##M,				\
 		KEYFMT_##KF,						\
 		1,							\
