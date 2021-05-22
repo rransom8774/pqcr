@@ -9,11 +9,11 @@ do
 	for symalg in shake256
 	do
 	    echo "${keyparams} ${sigseclevel} ${symalg}"
-	    if test -e "testvec-${keyparams}${sigseclevel}${symalg}s-0.bin"
+	    if test -e "out/testvecs/pkpsig/testvec-${keyparams}${sigseclevel}${symalg}s-0.bin"
 	    then
 		for i in $(seq 0 9)
 		do
-		    sha256sum "testvec-${keyparams}${sigseclevel}${symalg}s-${i}.bin" |tee -a testvec-hashes.txt
+		    sha256sum "out/testvecs/pkpsig/testvec-${keyparams}${sigseclevel}${symalg}s-${i}.bin" |tee -a testvec-hashes.txt
 		done
 	    fi
 	done

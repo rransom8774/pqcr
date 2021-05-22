@@ -23,6 +23,9 @@
 
 #include <XKCP/KeccakSponge.h>
 
+#include <sys/stat.h>
+#include <sys/types.h>
+
 static inline void pack_ui32(uint8_t *buf, uint32_t x) {
   buf[0] =  x        & 255;
   buf[1] = (x >>  8) & 255;
@@ -146,7 +149,8 @@ static int generate_test_vector_file(const char *psname, uint32_t i) {
 
   while (1) {
     fname_len = snprintf(fnamebuf.data, fnamebuf.capacity,
-			 "testvec-%s-%lu.bin", psname, (unsigned long)i);
+			 "out/testvecs/%s/testvec-%s-%lu.bin",
+			 "pkpsig", psname, (unsigned long)i);
     if (fname_len + 1 <= fnamebuf.capacity) {
       fnamebuf.data[fname_len] = '\0';
       fnamebuf.len = fname_len + 1;
@@ -206,6 +210,11 @@ int main(int argc, char *argv[]) {
   pkpsig_init();
 
   if (init_test_buffers(paramset_name, count) < 0) return 1;
+
+  /* mode 0777: rely on the user's umask for consistency with other programs */
+  mkdir("out", 0777);
+  mkdir("out/testvecs", 0777);
+  mkdir("out/testvecs/pkpsig", 0777);
 
   for (i = 0; i < count; ++i) {
     if (generate_test_vector_file(paramset_name, i) < 0) {
