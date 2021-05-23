@@ -196,7 +196,7 @@ void pkpsig_paramset_init() {
 #undef INIT_PKP_PARAM_SET
 
 #define DEFINE_PARAMSET(KF,Q,N,M,KSL,SSL,SYM,NRS,NRL)			\
-  init_paramset("q" #Q "n" #N "m" #M "k" #KSL "-" #SYM "-s" #SSL,		\
+  init_paramset("q" #Q "n" #N "m" #M "k" #KSL "-" #SYM "-s" #SSL,	\
 		PARAMSET_q##Q##n##N##m##M##k##KSL##_##SYM##_s##SSL,	\
 		PKP_PARAM_SET_q##Q##n##N##m##M,				\
 		KEYFMT_##KF,						\
