@@ -250,6 +250,40 @@ const struct pkpsig_paramset *pkpsig_paramset_get_by_name(const char *name) {
   return NULL;
 };
 
+int pkpsig_paramset_enumerate(pkpsig_paramset_enumerate_cb cb, void *ud) {
+  int rv;
+  int i;
+
+  if (init_status != INIT_STATUS_DONE) {
+    /* FIXME this may leak memory in a multithreaded program */    
+    pkpsig_paramset_init();
+  };
+
+  for (i = 0; i < N_PARAMSETS; ++i) {
+    rv = cb(ud, &paramsets[i]);
+    if (rv != 0) return rv;
+  };
+
+  return 0;
+};
+
+int pkpsig_paramset_enumerate_names(pkpsig_paramset_enumerate_names_cb cb, void *ud) {
+  int rv;
+  int i;
+
+  if (init_status != INIT_STATUS_DONE) {
+    /* FIXME this may leak memory in a multithreaded program */    
+    pkpsig_paramset_init();
+  };
+
+  for (i = 0; i < N_PARAMSETS; ++i) {
+    rv = cb(ud, paramsets[i].name);
+    if (rv != 0) return rv;
+  };
+
+  return 0;
+};
+
 size_t pkpsig_paramset_get_pkblob_bytes(const struct pkpsig_paramset *ps) {
   size_t rv;
 

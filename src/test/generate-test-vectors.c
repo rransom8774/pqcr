@@ -147,6 +147,9 @@ static int generate_test_vector_file(const char *psname, uint32_t i) {
   FILE *f = NULL;
   int rv = 0;
 
+  rv = init_test_buffers(psname, i);
+  if (rv < 0) return rv;
+
   while (1) {
     fname_len = snprintf(fnamebuf.data, fnamebuf.capacity,
 			 "out/testvecs/%s/testvec-%s-%lu.bin",
@@ -195,30 +198,52 @@ static int generate_test_vector_file(const char *psname, uint32_t i) {
   return rv;
 };
 
+static int enum_names_cb(void *ud, const char *name) {
+  uint32_t *pcount = ud;
+  uint32_t i;
+
+  printf("%s\n", name);
+
+  for (i = 0; i < *pcount; ++i) {
+    if (generate_test_vector_file(name, i) < 0) {
+      return 1;
+    };
+  };
+
+  return 0;
+};
+
 int main(int argc, char *argv[]) {
   uint32_t count = 10;  /* FIXME allow user to specify count */   
   uint32_t i;
   const char *paramset_name = NULL;
 
-  if (argc != 2) {
+  switch (argc) {
+  case 2:
+    paramset_name = argv[1];
+    /* fall through */
+  case 1:
+    break;
+  case 0:
+  default:
     fprintf(stderr, "usage: generate-test-vectors PARAMSET-NAME\n");
     return 2;
   };
 
-  paramset_name = argv[1];
-
   pkpsig_init();
-
-  if (init_test_buffers(paramset_name, count) < 0) return 1;
 
   /* mode 0777: rely on the user's umask for consistency with other programs */
   mkdir("out", 0777);
   mkdir("out/testvecs", 0777);
   mkdir("out/testvecs/pkpsig", 0777);
 
-  for (i = 0; i < count; ++i) {
-    if (generate_test_vector_file(paramset_name, i) < 0) {
-      return 1;
+  if (paramset_name == NULL) {
+    pkpsig_paramset_enumerate_names(enum_names_cb, &count);
+  } else {
+    for (i = 0; i < count; ++i) {
+      if (generate_test_vector_file(paramset_name, i) < 0) {
+	return 1;
+      };
     };
   };
 

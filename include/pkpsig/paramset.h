@@ -67,6 +67,12 @@ void pkpsig_paramset_init();
 
 const struct pkpsig_paramset *pkpsig_paramset_get_by_name(const char *name);
 
+typedef int (*pkpsig_paramset_enumerate_names_cb)(void *ud, const char *name);
+typedef int (*pkpsig_paramset_enumerate_cb)(void *ud, const struct pkpsig_paramset *ps);
+
+int pkpsig_paramset_enumerate(pkpsig_paramset_enumerate_cb cb, void *ud);
+int pkpsig_paramset_enumerate_names(pkpsig_paramset_enumerate_names_cb cb, void *ud);
+
 size_t pkpsig_paramset_get_pkblob_bytes(const struct pkpsig_paramset *ps);
 size_t pkpsig_paramset_get_skblob_bytes(const struct pkpsig_paramset *ps);
 size_t pkpsig_paramset_get_sig_bytes(const struct pkpsig_paramset *ps);
