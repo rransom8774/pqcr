@@ -106,7 +106,7 @@ test-bin: build-dirs $(TESTPROGS)
 
 
 build-dirs:
-	mkdir -p out out/djbsort out/pkpsig out/test
+	mkdir -p out out/djbsort out/pkpsig out/pqcr out/test
 
 
 out/test/generate-test-vectors: $(OBJS_GEN_TEST_VECS) $(OBJS_LIB)
