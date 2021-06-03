@@ -7,7 +7,12 @@
 CFLAGS_DJBSORT = -Iinclude/djbsort/ \
 	-g \
 
+CFLAGS_PQCR = -Iinclude/pqcr/ \
+	-Iinclude/djbsort/ \
+	-g \
+
 CFLAGS_PKPSIG = -Iinclude/pkpsig/ \
+	-Iinclude/pqcr/ \
 	-Iinclude/djbsort/ \
 	-g \
 
@@ -32,11 +37,19 @@ OBJS_DJBSORT = \
 	out/djbsort/uint32-useint32-sort.o \
 
 
+HEADERS_PQCR = \
+        include/pqcr/modulo.h \
+        include/pqcr/vectenc.h \
+
+OBJS_PQCR = \
+        out/pqcr/modulo.o \
+        out/pqcr/vectenc.o \
+
+
 HEADERS_PKPSIG = \
         include/pkpsig/api_common.h \
         include/pkpsig/api_unified.h \
         include/pkpsig/keys.h \
-        include/pkpsig/modulo.h \
         include/pkpsig/paramset.h \
         include/pkpsig/permute.h \
         include/pkpsig/randombytes.h \
@@ -44,7 +57,6 @@ HEADERS_PKPSIG = \
         include/pkpsig/sigstate.h \
         include/pkpsig/sort.h \
         include/pkpsig/symmetric.h \
-        include/pkpsig/vectenc.h \
         include/pkpsig/zkpshamir.h \
 
 OBJS_PKPSIG = \
@@ -54,7 +66,6 @@ OBJS_PKPSIG = \
         out/pkpsig/keys_generate.o \
         out/pkpsig/keys_math.o \
         out/pkpsig/keys_unpack.o \
-        out/pkpsig/modulo.o \
         out/pkpsig/paramset.o \
         out/pkpsig/permute.o \
         out/pkpsig/randombytes.o \
@@ -64,16 +75,17 @@ OBJS_PKPSIG = \
         out/pkpsig/sort_int32.o \
         out/pkpsig/symmetric_core.o \
         out/pkpsig/symmetric_shake256.o \
-        out/pkpsig/vectenc.o \
         out/pkpsig/zkpshamir.o \
 
 
 HEADERS_LIB = \
 	$(HEADERS_DJBSORT) \
+	$(HEADERS_PQCR) \
 	$(HEADERS_PKPSIG) \
 
 OBJS_LIB = \
 	$(OBJS_DJBSORT) \
+	$(OBJS_PQCR) \
 	$(OBJS_PKPSIG) \
 
 
@@ -113,6 +125,13 @@ out/djbsort/uint32-useint32-sort.o: src/djbsort/uint32-useint32-sort.c $(HEADERS
 	cc -c -o $@ $< $(CFLAGS_DJBSORT)
 
 
+out/pqcr/modulo.o: src/pqcr/modulo.c $(HEADERS_PQCR)
+	cc -c -o $@ $< $(CFLAGS_PQCR)
+
+out/pqcr/vectenc.o: src/pqcr/vectenc.c $(HEADERS_PQCR)
+	cc -c -o $@ $< $(CFLAGS_PQCR)
+
+
 out/pkpsig/api_common.o: src/pkpsig/api_common.c $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
@@ -129,9 +148,6 @@ out/pkpsig/keys_math.o: src/pkpsig/keys_math.c $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
 out/pkpsig/keys_unpack.o: src/pkpsig/keys_unpack.c $(HEADERS_PKPSIG)
-	cc -c -o $@ $< $(CFLAGS_PKPSIG)
-
-out/pkpsig/modulo.o: src/pkpsig/modulo.c $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
 out/pkpsig/paramset.o: src/pkpsig/paramset.c $(HEADERS_PKPSIG)
@@ -159,9 +175,6 @@ out/pkpsig/symmetric_core.o: src/pkpsig/symmetric_core.c $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
 out/pkpsig/symmetric_shake256.o: src/pkpsig/symmetric_shake256.c $(HEADERS_PKPSIG)
-	cc -c -o $@ $< $(CFLAGS_PKPSIG)
-
-out/pkpsig/vectenc.o: src/pkpsig/vectenc.c $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
 out/pkpsig/zkpshamir.o: src/pkpsig/zkpshamir.c $(HEADERS_PKPSIG)
