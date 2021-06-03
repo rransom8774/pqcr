@@ -24,7 +24,7 @@ static int pkpsig_key_public_init(struct pkpsig_keypublic *pub) {
   size_t m = ps->pkpparams->m;
   size_t m_align_mask = (((size_t)1) << PKPSIG_MATRIX_COLUMN_ALIGNMENT_BITS) - 1;
   size_t m_aligned = (((m + m_align_mask) >> PKPSIG_MATRIX_COLUMN_ALIGNMENT_BITS) <<
-		      PKPSIG_MATRIX_COLUMN_ALIGNMENT_BITS);
+                      PKPSIG_MATRIX_COLUMN_ALIGNMENT_BITS);
 
   kp->v = calloc(n, sizeof(uint16_t));
   if (kp->v == NULL) return -1;

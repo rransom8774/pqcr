@@ -182,10 +182,10 @@ void pkpsig_scratch_store_zero_bufs(struct pkpsig_scratch_store *st) {
 void pkpsig_scratch_store_free_bufs(struct pkpsig_scratch_store *st) {
 
   /* random macro name */
-#define olbhqtn(field)				\
-  if (st->field != NULL) {			\
-    free(st->field);				\
-    st->field = NULL;				\
+#define olbhqtn(field)                          \
+  if (st->field != NULL) {                      \
+    free(st->field);                            \
+    st->field = NULL;                           \
   }
 
   olbhqtn(algo_state);
@@ -230,7 +230,7 @@ static int expand_fqvec(struct pkpsig_scratch_store *st, const struct pkpsig_par
     max_uniform = ps->pkpparams->q_uniform_sampler_maxval;
     for (i = 0; i < veclen; ++i) {
       if (st->vecbuf[i] > max_uniform) {
-	return -1;
+        return -1;
       };
     };
   };
@@ -307,7 +307,7 @@ static int expand_perm(struct pkpsig_scratch_store *st, const struct pkpsig_para
     /* check for uniformity */
     for (i = 1; i < n; ++i) {
       if (((st->vecbuf[i-1] ^ st->vecbuf[i]) & PERMSAMPLER_RANDOM_MASK) == 0) {
-	return -1;
+        return -1;
       };
     };
   };
@@ -340,7 +340,7 @@ void pkpsig_symmetric_seckeychecksum(struct pkpsig_scratch_store *st, struct pkp
   const struct pkpsig_paramset *ps = key->pub.kp.ps;
   size_t pkblob_bytes = pkpsig_paramset_get_pkblob_bytes(ps);
   uint8_t params[2] = { ps->seclevel_keypair->preimage_bytes,
-			ps->seclevel_keypair->crhash_bytes };
+                        ps->seclevel_keypair->crhash_bytes };
 
   st->algo->hash_init(st, HASHCTX_SECKEYCHECKSUM, params, 2);
   st->algo->hash_chunk(st, key->pub.pkblob, pkblob_bytes);
@@ -356,7 +356,7 @@ void pkpsig_symmetric_gen_msghash_salt(struct pkpsig_sigstate *sst, const uint8_
     { { &ctx, 1 },
       { message, messagelen },
       { sst->key->skblob + keyfmt->bytes_pubparamseed + keyfmt->bytes_seckeyseed,
-	keyfmt->bytes_saltgenseed } };
+        keyfmt->bytes_saltgenseed } };
 
   sst->st->algo->XOF_chunked_input(sst->st, sst->salt_and_msghash, ps->seclevel_keypair->crhash_bytes, chunks, 3);
 };
@@ -429,7 +429,7 @@ void pkpsig_symmetric_gen_blindingseeds(struct pkpsig_sigstate *sst) {
     do {
       pack_ui32(index_buf, run->run_index);
       st->algo->XOF_chunked_input(st, sst->bsg_buf, bsgs_bytes + key_preimage_bytes,
-				  chunks, 3);
+                                  chunks, 3);
 
       st->algo->hash_init(st, HASHCTX_EXPANDBLINDINGSEED, sst->salt_and_msghash, key_crhash_bytes * 2);
       pkpsig_scratch_store_set_prefix(st);
@@ -582,7 +582,7 @@ static void tree_hash_level(struct pkpsig_scratch_store *st) {
      context, prefix string, and parameter string. */
 
   ptr_out_end = ptr_out + key_crhash_bytes*( (node_count_in/degree) +
-					     ((node_count_in%degree)!=0) );
+                                             ((node_count_in%degree)!=0) );
   assert(ptr_out_end <= st->treehash_buf + st->treehash_buf_bytes);
 
   idx_in = 0;
@@ -647,7 +647,7 @@ static void tree_hash(struct pkpsig_scratch_store *st, uint8_t *outbuf, int preh
   st->treehash_next_header_index = (prehash ? st->treehash_node_count : 0);
 
   st->algo->hash_init(st, st->treehash_context,
-		      st->treehash_prefix, st->treehash_prefix_bytes);
+                      st->treehash_prefix, st->treehash_prefix_bytes);
   st->algo->hash_chunk(st, st->treehash_params, 7);
   pkpsig_scratch_store_set_prefix(st);
 
@@ -739,7 +739,7 @@ void pkpsig_symmetric_expand_challenge1s(struct pkpsig_sigstate *sst, int verify
      duplication. */
 
   st->algo->hash_init(st, HASHCTX_CHALLENGE1EXPAND,
-		      sst->salt_and_msghash, key_crhash_bytes*2);
+                      sst->salt_and_msghash, key_crhash_bytes*2);
   st->algo->hash_chunk(st, st->treehash_params, 7);
   st->algo->hash_chunk(st, sst->challenge1_seed, sig_crhash_bytes);
 
@@ -825,7 +825,7 @@ void pkpsig_symmetric_expand_challenge2s(struct pkpsig_sigstate *sst, int verify
   size_t padlen, i;
 
   st->algo->hash_init(st, HASHCTX_CHALLENGE2EXPAND,
-		      sst->salt_and_msghash, key_crhash_bytes*2);
+                      sst->salt_and_msghash, key_crhash_bytes*2);
   st->algo->hash_chunk(st, st->treehash_params, 7);
   st->algo->hash_chunk(st, sst->challenge1_seed, sig_crhash_bytes);
   st->algo->hash_chunk(st, sst->challenge2_seed, sig_crhash_bytes);

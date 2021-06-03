@@ -152,8 +152,8 @@ static int generate_test_vector_file(const char *psname, uint32_t i) {
 
   while (1) {
     fname_len = snprintf(fnamebuf.data, fnamebuf.capacity,
-			 "out/testvecs/%s/testvec-%s-%lu.bin",
-			 "pkpsig", psname, (unsigned long)i);
+                         "out/testvecs/%s/testvec-%s-%lu.bin",
+                         "pkpsig", psname, (unsigned long)i);
     if (fname_len + 1 <= fnamebuf.capacity) {
       fnamebuf.data[fname_len] = '\0';
       fnamebuf.len = fname_len + 1;
@@ -242,7 +242,7 @@ int main(int argc, char *argv[]) {
   } else {
     for (i = 0; i < count; ++i) {
       if (generate_test_vector_file(paramset_name, i) < 0) {
-	return 1;
+        return 1;
       };
     };
   };

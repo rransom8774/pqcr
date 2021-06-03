@@ -22,9 +22,9 @@ static inline void unpack_ui32vec(uint32_t *v, const uint8_t *buf, size_t n) {
 
   for (i = 0; i < n; ++i) {
     v[i] = (( ((uint32_t)buf[(4*i)+0])       ) +
-	    ((((uint32_t)buf[(4*i)+1]) <<  8)) +
-	    ((((uint32_t)buf[(4*i)+2]) << 16)) +
-	    ((((uint32_t)buf[(4*i)+3]) << 24)));
+            ((((uint32_t)buf[(4*i)+1]) <<  8)) +
+            ((((uint32_t)buf[(4*i)+2]) << 16)) +
+            ((((uint32_t)buf[(4*i)+3]) << 24)));
   };
 };
 

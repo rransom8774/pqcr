@@ -63,9 +63,9 @@ struct pkpsig_sigstate *pkpsig_sigstate_new(struct pkpsig_scratch_store *st) {
   if (sst->b_vec == NULL) goto err;
 
   bytes_per_run = (key_preimage_bytes /* blindingseed */ +
-		   n * 4 /* pi_sigma_inv, sigma, z_buf */);
+                   n * 4 /* pi_sigma_inv, sigma, z_buf */);
   ui16s_per_run = (n * 3 /* r_sigma, v_pi_sigma, z */ +
-		   m /* Ar */);
+                   m /* Ar */);
   extra_byte_runs = (bsgs_bytes*2 + key_preimage_bytes + bytes_per_run-1)/bytes_per_run;
 
   sst->run_vectors_bytes = calloc(nruns + extra_byte_runs, bytes_per_run * sizeof(uint8_t));

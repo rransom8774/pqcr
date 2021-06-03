@@ -63,9 +63,9 @@ static const struct pkpsig_keyfmt keyfmts[N_KEYFMTS] =
   };
 
 enum paramset_enum {
-#define DEFINE_PARAMSET(KF,Q,N,M,KSL,SSL,SYM,NRS,NRL)		\
-  PARAMSET_q##Q##n##N##m##M##k##KSL##_##SYM##_s##SSL,		\
-  PARAMSET_q##Q##n##N##m##M##k##KSL##_##SYM##_s##SSL##_u,	\
+#define DEFINE_PARAMSET(KF,Q,N,M,KSL,SSL,SYM,NRS,NRL)           \
+  PARAMSET_q##Q##n##N##m##M##k##KSL##_##SYM##_s##SSL,           \
+  PARAMSET_q##Q##n##N##m##M##k##KSL##_##SYM##_s##SSL##_u,       \
   PARAMSET_q##Q##n##N##m##M##k##KSL##_##SYM##_s##SSL##_m,
 #include "paramset_list.h"
 #undef DEFINE_PARAMSET
@@ -195,40 +195,40 @@ void pkpsig_paramset_init() {
   INIT_PKP_PARAM_SET(1789,111,55);
 #undef INIT_PKP_PARAM_SET
 
-#define DEFINE_PARAMSET(KF,Q,N,M,KSL,SSL,SYM,NRS,NRL)			\
-  init_paramset("q" #Q "n" #N "m" #M "k" #KSL "-" #SYM "-s" #SSL,	\
-		PARAMSET_q##Q##n##N##m##M##k##KSL##_##SYM##_s##SSL,	\
-		PKP_PARAM_SET_q##Q##n##N##m##M,				\
-		KEYFMT_##KF,						\
-		1,							\
-		0,							\
-		#KSL,							\
-		#SSL,							\
-		#SYM,							\
-		NRS,							\
-		NRL);							\
-  init_paramset("q" #Q "n" #N "m" #M "k" #KSL "-" #SYM "-s" #SSL "-u",	\
-		PARAMSET_q##Q##n##N##m##M##k##KSL##_##SYM##_s##SSL##_u,	\
-		PKP_PARAM_SET_q##Q##n##N##m##M,				\
-		KEYFMT_##KF,						\
-		0,							\
-		0,							\
-		#KSL,							\
-		#SSL,							\
-		#SYM,							\
-		NRS,							\
-		NRL);							\
-  init_paramset("q" #Q "n" #N "m" #M "k" #KSL "-" #SYM "-s" #SSL "-m",	\
-		PARAMSET_q##Q##n##N##m##M##k##KSL##_##SYM##_s##SSL##_m,	\
-		PKP_PARAM_SET_q##Q##n##N##m##M,				\
-		KEYFMT_##KF,						\
-		1,							\
-		1,							\
-		#KSL,							\
-		#SSL,							\
-		#SYM,							\
-		NRS,							\
-		NRL);
+#define DEFINE_PARAMSET(KF,Q,N,M,KSL,SSL,SYM,NRS,NRL)                   \
+  init_paramset("q" #Q "n" #N "m" #M "k" #KSL "-" #SYM "-s" #SSL,       \
+                PARAMSET_q##Q##n##N##m##M##k##KSL##_##SYM##_s##SSL,     \
+                PKP_PARAM_SET_q##Q##n##N##m##M,                         \
+                KEYFMT_##KF,                                            \
+                1,                                                      \
+                0,                                                      \
+                #KSL,                                                   \
+                #SSL,                                                   \
+                #SYM,                                                   \
+                NRS,                                                    \
+                NRL);                                                   \
+  init_paramset("q" #Q "n" #N "m" #M "k" #KSL "-" #SYM "-s" #SSL "-u",  \
+                PARAMSET_q##Q##n##N##m##M##k##KSL##_##SYM##_s##SSL##_u, \
+                PKP_PARAM_SET_q##Q##n##N##m##M,                         \
+                KEYFMT_##KF,                                            \
+                0,                                                      \
+                0,                                                      \
+                #KSL,                                                   \
+                #SSL,                                                   \
+                #SYM,                                                   \
+                NRS,                                                    \
+                NRL);                                                   \
+  init_paramset("q" #Q "n" #N "m" #M "k" #KSL "-" #SYM "-s" #SSL "-m",  \
+                PARAMSET_q##Q##n##N##m##M##k##KSL##_##SYM##_s##SSL##_m, \
+                PKP_PARAM_SET_q##Q##n##N##m##M,                         \
+                KEYFMT_##KF,                                            \
+                1,                                                      \
+                1,                                                      \
+                #KSL,                                                   \
+                #SSL,                                                   \
+                #SYM,                                                   \
+                NRS,                                                    \
+                NRL);
 #include "paramset_list.h"
 #undef DEFINE_PARAMSET
 
@@ -297,9 +297,9 @@ size_t pkpsig_paramset_get_skblob_bytes(const struct pkpsig_paramset *ps) {
   const struct pkpsig_keyfmt *keyfmt = ps->keyfmt;
 
   return (keyfmt->bytes_pubparamseed +
-	  keyfmt->bytes_seckeyseed +
-	  keyfmt->bytes_saltgenseed +
-	  keyfmt->bytes_seckeychecksum);
+          keyfmt->bytes_seckeyseed +
+          keyfmt->bytes_saltgenseed +
+          keyfmt->bytes_seckeychecksum);
 };
 
 size_t pkpsig_paramset_get_sig_bytes(const struct pkpsig_paramset *ps) {
@@ -318,12 +318,12 @@ size_t pkpsig_paramset_get_sig_bytes(const struct pkpsig_paramset *ps) {
      pkpsig_vectcoder_get_nbytes);
   size_t bytes_z = vc_get_nbytes(pkpparams->vc_sig_z);
   size_t bytes_perm = vc_get_nbytes(ps->squish_perms ?
-				    pkpparams->vc_sig_perm_squished :
-				    pkpparams->vc_sig_perm_unsquished);
+                                    pkpparams->vc_sig_perm_squished :
+                                    pkpparams->vc_sig_perm_unsquished);
   size_t bytes_long = (bytes_z + bytes_perm) * nruns_long;
   size_t bytes_heads = (ps->merge_vect_roots ?
-			pkpsig_vectcoder_get_nbytes(ps->vc_runvec_heads) :
-			0);
+                        pkpsig_vectcoder_get_nbytes(ps->vc_runvec_heads) :
+                        0);
   return (bytes_hashes + bytes_common + bytes_short + bytes_long + bytes_heads);
 };
 

@@ -190,19 +190,19 @@ void pkpsig_vectcoder_free(struct vectcoder *vc) {
   if (vc != NULL) {
     if (vc->steps != NULL) {
       for (i = 0; i < vc->nsteps; ++i) {
-	if (vc->steps[i].merge != NULL) {
-	  if (vc->steps[i].merge->moduli != NULL) {
-	    free((modulus *)(vc->steps[i].merge->moduli));
-	  };
-	  free((void *)(vc->steps[i].merge));
-	};
+        if (vc->steps[i].merge != NULL) {
+          if (vc->steps[i].merge->moduli != NULL) {
+            free((modulus *)(vc->steps[i].merge->moduli));
+          };
+          free((void *)(vc->steps[i].merge));
+        };
 
-	if (vc->steps[i].bytes != NULL) {
-	  if (vc->steps[i].bytes->outcounts != NULL) {
-	    free((void *)(vc->steps[i].bytes->outcounts));
-	  };
-	  free((void *)(vc->steps[i].bytes));
-	};
+        if (vc->steps[i].bytes != NULL) {
+          if (vc->steps[i].bytes->outcounts != NULL) {
+            free((void *)(vc->steps[i].bytes->outcounts));
+          };
+          free((void *)(vc->steps[i].bytes));
+        };
       };
 
       free((void *)(vc->steps));

@@ -27,7 +27,7 @@ void pkpsig_key_generate(struct pkpsig_scratch_store *st, struct pkpsig_keysecre
   /* Generate the most secret part first, as a separate RNG call */
   pkpsig_randombytes(key->skblob + keyfmt->bytes_pubparamseed, keyfmt->bytes_seckeyseed);
   pkpsig_randombytes(key->skblob + keyfmt->bytes_pubparamseed + keyfmt->bytes_seckeyseed,
-		     keyfmt->bytes_saltgenseed);
+                     keyfmt->bytes_saltgenseed);
 
   /* Now generate a parameter seed by rejection sampling */
   rv = -1;

@@ -138,22 +138,22 @@ void pkpsig_zkpshamir_encode_proofs(struct pkpsig_sigstate *sst, uint8_t *outbuf
       if (squish_perms) pkpsig_perm_squish(st, run->sigma);
 
       for (j = 0; j < n; ++j) {
-	z_buf[j] = run->z[j];
-	perm_buf[j] = run->sigma[j];
+        z_buf[j] = run->z[j];
+        perm_buf[j] = run->sigma[j];
       };
 
       if (merge_vect_roots) {
-	pkpsig_vectcoder_encode_separate_root(vc_z, plong, proots, z_buf);
-	plong += nbytes_z; ++proots;
+        pkpsig_vectcoder_encode_separate_root(vc_z, plong, proots, z_buf);
+        plong += nbytes_z; ++proots;
 
-	pkpsig_vectcoder_encode_separate_root(vc_perm, plong, proots, perm_buf);
-	plong += nbytes_perm; ++proots;
+        pkpsig_vectcoder_encode_separate_root(vc_perm, plong, proots, perm_buf);
+        plong += nbytes_perm; ++proots;
       } else {
-	pkpsig_vectcoder_encode(vc_z, plong, z_buf);
-	plong += nbytes_z;
+        pkpsig_vectcoder_encode(vc_z, plong, z_buf);
+        plong += nbytes_z;
 
-	pkpsig_vectcoder_encode(vc_perm, plong, perm_buf);
-	plong += nbytes_perm;
+        pkpsig_vectcoder_encode(vc_perm, plong, perm_buf);
+        plong += nbytes_perm;
       };
     } else {
       /* short-proof run */
@@ -219,8 +219,8 @@ void pkpsig_zkpshamir_decode_proofs(struct pkpsig_sigstate *sst, const uint8_t *
   proots = (uint32_t *)(st->treehash_buf);
   if (merge_vect_roots) {
     pkpsig_vectcoder_decode(ps->vc_runvec_heads,
-			    proots,
-			    plong + (nbytes_long * nruns_long));
+                            proots,
+                            plong + (nbytes_long * nruns_long));
   };
 
   /* short-proof runs */

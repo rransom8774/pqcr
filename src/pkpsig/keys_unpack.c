@@ -23,8 +23,8 @@
 int pkpsig_key_unpack_skblob_internal(struct pkpsig_scratch_store *st, struct pkpsig_keysecret *key, int set_checksum) {
   const struct pkpsig_keyfmt *keyfmt = key->pub.kp.ps->keyfmt;
   uint8_t *skblob_checksum = key->skblob + (keyfmt->bytes_pubparamseed +
-					    keyfmt->bytes_seckeyseed +
-					    keyfmt->bytes_saltgenseed);
+                                            keyfmt->bytes_seckeyseed +
+                                            keyfmt->bytes_saltgenseed);
   size_t m = key->pub.kp.ps->pkpparams->m;
   size_t i;
   union {
@@ -55,8 +55,8 @@ int pkpsig_key_unpack_skblob_internal(struct pkpsig_scratch_store *st, struct pk
   /* fill in the public key vector */
   for (i = 0; i < m; ++i) st->vecbuf[i] = key->pub.u[i];
   pkpsig_vectcoder_encode(key->pub.kp.ps->pkpparams->vc_pubkey_u,
-			  key->pub.pkblob + keyfmt->bytes_pubparamseed,
-			  st->vecbuf);
+                          key->pub.pkblob + keyfmt->bytes_pubparamseed,
+                          st->vecbuf);
 
   /* try to clear the buffer */
   memset(x.v_pi, 0, 128 * sizeof(uint16_t));
