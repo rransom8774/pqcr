@@ -17,6 +17,7 @@ CFLAGS_PKPSIG = -Iinclude/pkpsig/ \
 	-g \
 
 CFLAGS_TEST = -Iinclude/ \
+	-Iinclude/pqcr/ \
 	-g \
 
 
