@@ -25,6 +25,7 @@ struct pkpsig_sort_blob {
   uint8_t *value;
 };
 
+void pkpsig_batcher_merge_blob(struct pkpsig_sort_blob *blobs, int mergelen_l2, size_t nblobs, size_t value_bytes);
 void pkpsig_sort_blob(struct pkpsig_sort_blob *blobs, size_t nblobs, size_t value_bytes);
 
 #endif
