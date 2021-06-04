@@ -671,7 +671,6 @@ void pkpsig_symmetric_hash_commit1s(struct pkpsig_sigstate *sst, uint8_t *outbuf
   size_t i;
   size_t nruns_short = ps->nruns_short;
   size_t nruns = nruns_short + ps->nruns_long;
-  int sort;
 
   /* During signing, runs[i].run_index == i.
 
