@@ -615,7 +615,7 @@ static void tree_hash_level(struct pkpsig_scratch_store *st) {
 
 /* Does a full tree hashing operation, and puts the root hash of the
    tree in outbuf.  Inputs are in st->treehash_leaves. */
-static void tree_hash(struct pkpsig_scratch_store *st, uint8_t *outbuf, int prehash, int sort) {
+static void tree_hash(struct pkpsig_scratch_store *st, uint8_t *outbuf, int prehashed) {
   const struct pkpsig_paramset *ps = st->ps;
   size_t sig_crhash_bytes = ps->seclevel_signature->crhash_bytes;
 
@@ -626,25 +626,9 @@ static void tree_hash(struct pkpsig_scratch_store *st, uint8_t *outbuf, int preh
      schemes which this function is intended for do not perform tree
      hashing on a single leaf, and the single-leaf input case is
      useless, we simply refuse to deal with it. */
-  assert(prehash || (st->treehash_node_count > 1));
+  assert(prehashed || (st->treehash_node_count > 1));
 
-  /* Pre-hashing is used primarily to reduce the size of nodes before
-     sorting them, so do that first. */
-  if (prehash) {
-    tree_hash_prehash(st);
-  };
-
-  if (sort) {
-    pkpsig_sort_blob(st->treehash_leaves, st->treehash_node_count, st->treehash_node_bytes);
-
-#ifdef DEBUG_CHECK_SORT
-    for (i = 0; i < st->treehash_node_count; ++i) {
-      assert(nodes[i].key == i);
-    };
-#endif
-  };
-
-  st->treehash_next_header_index = (prehash ? st->treehash_node_count : 0);
+  st->treehash_next_header_index = (prehashed ? st->treehash_node_count : 0);
 
   st->algo->hash_init(st, st->treehash_context,
                       st->treehash_prefix, st->treehash_prefix_bytes);
@@ -722,7 +706,7 @@ void pkpsig_symmetric_hash_commit1s(struct pkpsig_sigstate *sst, uint8_t *outbuf
   st->treehash_prefix = sst->salt_and_msghash;
   st->treehash_prefix_bytes = key_crhash_bytes*2;
 
-  tree_hash(st, outbuf, 0, 0);
+  tree_hash(st, outbuf, 0);
 };
 
 void pkpsig_symmetric_expand_challenge1s(struct pkpsig_sigstate *sst, int verifying) {
@@ -795,9 +779,10 @@ void pkpsig_symmetric_hash_commit2s(struct pkpsig_sigstate *sst, uint8_t *outbuf
   struct pkpsig_sigstate_run *runs = sst->runs;
   struct pkpsig_sort_blob *leaves = st->treehash_leaves;
   size_t key_crhash_bytes = ps->seclevel_keypair->crhash_bytes;
-  size_t nruns = ps->nruns_short + ps->nruns_long;
+  size_t sig_crhash_bytes = ps->seclevel_signature->crhash_bytes;
+  size_t nruns_short = ps->nruns_short;
+  size_t nruns = nruns_short + ps->nruns_long;
   size_t i;
-  int sort;
 
   for (i = 0; i < nruns; ++i) {
     pack_ui16vec(runs[i].z_buf, runs[i].z, ps->pkpparams->n);
@@ -812,10 +797,13 @@ void pkpsig_symmetric_hash_commit2s(struct pkpsig_sigstate *sst, uint8_t *outbuf
   st->treehash_prefix = sst->salt_and_msghash;
   st->treehash_prefix_bytes = key_crhash_bytes*2;
 
-  /* sort during verification only */
-  sort = verifying;
+  tree_hash_prehash(st);
 
-  tree_hash(st, outbuf, 1, sort);
+  if (verifying) {
+    pkpsig_merge_runs_blob(leaves, nruns_short, nruns, key_crhash_bytes);
+  };
+
+  tree_hash(st, outbuf, 1);
 };
 
 void pkpsig_symmetric_expand_challenge2s(struct pkpsig_sigstate *sst, int verifying) {
