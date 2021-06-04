@@ -55,8 +55,8 @@ int pkpsig_key_unpack_skblob_internal(struct pkpsig_scratch_store *st, struct pk
   /* fill in the public key vector */
   for (i = 0; i < m; ++i) st->vecbuf[i] = key->pub.u[i];
   pqcr_vectcoder_encode(key->pub.kp.ps->pkpparams->vc_pubkey_u,
-                          key->pub.pkblob + keyfmt->bytes_pubparamseed,
-                          st->vecbuf);
+                        key->pub.pkblob + keyfmt->bytes_pubparamseed,
+                        st->vecbuf);
 
   /* try to clear the buffer */
   memset(x.v_pi, 0, 128 * sizeof(uint16_t));

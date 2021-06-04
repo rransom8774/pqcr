@@ -219,8 +219,8 @@ void pkpsig_zkpshamir_decode_proofs(struct pkpsig_sigstate *sst, const uint8_t *
   proots = (uint32_t *)(st->treehash_buf);
   if (merge_vect_roots) {
     pqcr_vectcoder_decode(ps->vc_runvec_heads,
-                            proots,
-                            plong + (nbytes_long * nruns_long));
+                          proots,
+                          plong + (nbytes_long * nruns_long));
   };
 
   /* short-proof runs */
