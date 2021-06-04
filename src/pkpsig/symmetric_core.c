@@ -693,10 +693,20 @@ void pkpsig_symmetric_hash_commit1s(struct pkpsig_sigstate *sst, uint8_t *outbuf
       leaves[i].value = runs[i].com1;
     };
 
-    for (i = 0; i < nruns; ++i) {
-      leaves[nruns + i].key = i * 2 + (1 - b_vec[i]);
-      leaves[nruns + i].value = unopened_coms + (sig_crhash_bytes * i);
+    pkpsig_merge_runs_blob(leaves, nruns_short, nruns, sig_crhash_bytes);
+
+    i = nruns;
+    while (i != 0) {
+      --i;
+
+      leaves[2*i + 1].key = leaves[i].key;
+      leaves[2*i + 1].value = leaves[i].value;
+
+      leaves[2*i].key = 2*i + (1 - b_vec[i]);
+      leaves[2*i].value = unopened_coms + (sig_crhash_bytes * i);
     };
+
+    pkpsig_sort_pairs_blob(leaves, nruns*2, sig_crhash_bytes);
   } else {
     /* signing */
     for (i = 0; i < nruns; ++i) {
@@ -713,10 +723,7 @@ void pkpsig_symmetric_hash_commit1s(struct pkpsig_sigstate *sst, uint8_t *outbuf
   st->treehash_prefix = sst->salt_and_msghash;
   st->treehash_prefix_bytes = key_crhash_bytes*2;
 
-  /* sort during verification only */
-  sort = verifying;
-
-  tree_hash(st, outbuf, 0, sort);
+  tree_hash(st, outbuf, 0, 0);
 };
 
 void pkpsig_symmetric_expand_challenge1s(struct pkpsig_sigstate *sst, int verifying) {

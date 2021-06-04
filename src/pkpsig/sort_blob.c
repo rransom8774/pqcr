@@ -44,6 +44,38 @@ void pkpsig_batcher_merge_blob(struct pkpsig_sort_blob *blobs, int mergelen_l2, 
   };
 };
 
+/* Given two sorted subsequences, one at indices from 0 to nfirstrun-1
+ * and one at indices from nfirstrun to nblobs-1, merge them into a
+ * single sorted sequence. */
+void pkpsig_merge_runs_blob(struct pkpsig_sort_blob *blobs, size_t nfirstrun, size_t nblobs, size_t value_bytes) {
+  int mergelen_l2 = 1;
+  size_t mergelen = ((size_t) 1) << mergelen_l2,
+         mergemask = mergelen - 1,
+         chunkstart = nfirstrun & ~mergemask;
+
+  while ((chunkstart != 0) || (mergelen < nblobs)) {
+    if (chunkstart != nfirstrun) {
+      pkpsig_batcher_merge_blob(blobs + chunkstart, mergelen_l2, nblobs - chunkstart, value_bytes);
+    };
+
+    /* increment mergelen_l2 and set all derived vars accordingly */
+    ++mergelen_l2; mergelen += mergelen;
+    mergemask += mergemask + 1; chunkstart = nfirstrun & ~mergemask;
+  };
+
+  pkpsig_batcher_merge_blob(blobs, mergelen_l2, nblobs, value_bytes);
+};
+
+void pkpsig_sort_pairs_blob(struct pkpsig_sort_blob *blobs, size_t nblobs, size_t value_bytes) {
+  size_t i;
+
+  nblobs &= ~(size_t) 1;
+
+  for (i = 0; i < nblobs; i += 2) {
+    pkpsig_batcher_merge_blob(blobs + i, 1, nblobs - i, value_bytes);
+  };
+};
+
 void pkpsig_sort_blob(struct pkpsig_sort_blob *blobs, size_t nblobs, size_t value_bytes) {
   const size_t n2 = 2*nblobs;
   int mergelen_l2;
