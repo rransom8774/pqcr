@@ -4,29 +4,35 @@
 .PHONY: test-bin build-dirs
 
 
+CFLAGS = -g
+
+
 CFLAGS_DJBSORT = -Iinclude/djbsort/ \
-	-g \
+	${CFLAGS} \
 
 CFLAGS_PQCR = -Iinclude/pqcr/ \
 	-Iinclude/djbsort/ \
-	-g \
+	${CFLAGS} \
 
 CFLAGS_PKPSIG = -Iinclude/pkpsig/ \
 	-Iinclude/pqcr/ \
 	-Iinclude/djbsort/ \
-	-g \
+	${CFLAGS} \
 
 CFLAGS_TEST = -Iinclude/ \
 	-Iinclude/pqcr/ \
-	-g \
+	${CFLAGS} \
 
 
-LIBS = -g \
-	-lXKCP \
+LIBS = -lXKCP \
 
-LIBS_TEST = -g \
-	-lXKCP \
+LIBS_TEST = ${LIBS} \
 	-lcrypto \
+
+
+LDFLAGS = -g
+
+LDFLAGS_TEST = ${LDFLAGS} ${LIBS_TEST}
 
 
 HEADERS_DJBSORT = \
@@ -110,7 +116,7 @@ build-dirs:
 
 
 out/test/generate-test-vectors: $(OBJS_GEN_TEST_VECS) $(OBJS_LIB)
-	$(CC) -o $@ $+ $(LIBS_TEST)
+	$(CC) -o $@ $+ $(LDFLAGS_TEST)
 
 out/test/randombytes_shake256_deterministic.o: src/test/randombytes_shake256_deterministic.c $(HEADERS_GEN_TEST_VECS)
 	$(CC) -c -o $@ $(CFLAGS_TEST) $<
