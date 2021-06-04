@@ -28,7 +28,7 @@ static inline uint64_t ceildiv(uint64_t x, uint32_t div) {
   return y / (uint64_t)div;
 };
 
-int pkpsig_modulus_init(struct modulus *mod, uint32_t value) {
+int pqcr_modulus_init(struct modulus *mod, uint32_t value) {
   if ((value == 0) || (value > MODULUS_MAX)) {
     return -1;
   };

@@ -32,28 +32,28 @@ struct modulus {
 
 /* maximum value 16384 */
 /* returns 0 on success, <0 on failure (invalid input only) */
-int pkpsig_modulus_init(struct modulus *mod, uint32_t value);
+int pqcr_modulus_init(struct modulus *mod, uint32_t value);
 
 /* maximum value 2**30 - 1; no error checking */
-static inline uint32_t pkpsig_modulus_divide(const struct modulus *mod, uint32_t value) {
+static inline uint32_t pqcr_modulus_divide(const struct modulus *mod, uint32_t value) {
   return (uint32_t)( (((uint64_t)value) * (uint64_t)(mod->recip)) >> (31 + mod->shift) );
 };
 
 /* maximum value 2**30 - 1; no error checking */
-static inline uint32_t pkpsig_modulus_divmod(const struct modulus *mod, uint32_t *rem_out, uint32_t value) {
-  uint32_t q = pkpsig_modulus_divide(mod, value);
+static inline uint32_t pqcr_modulus_divmod(const struct modulus *mod, uint32_t *rem_out, uint32_t value) {
+  uint32_t q = pqcr_modulus_divide(mod, value);
   *rem_out = value - (q * (uint32_t)mod->orig);
   return q;
 };
 
 /* maximum value 2**30 - 1; no error checking */
-static inline uint32_t pkpsig_modulus_modulo(const struct modulus *mod, uint32_t value) {
+static inline uint32_t pqcr_modulus_modulo(const struct modulus *mod, uint32_t value) {
   uint32_t r;
-  (void)pkpsig_modulus_divmod(mod, &r, value);
+  (void)pqcr_modulus_divmod(mod, &r, value);
   return r;
 };
 
-static inline uint32_t pkpsig_modulus_mult(const struct modulus *mod, uint32_t value) {
+static inline uint32_t pqcr_modulus_mult(const struct modulus *mod, uint32_t value) {
   return value * (uint32_t)mod->orig;
 };
 

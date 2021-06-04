@@ -240,7 +240,7 @@ static int expand_fqvec(struct pkpsig_scratch_store *st, const struct pkpsig_par
   for (i = 0; i < veclen; ++i) {
     uint32_t x = st->vecbuf[i];
     x = (x & 0xFFFFFF) + ((x >> 24) * reduce24);
-    x = pkpsig_modulus_modulo(&(ps->pkpparams->q), x);
+    x = pqcr_modulus_modulo(&(ps->pkpparams->q), x);
     st->vecbuf[i] = outvec[i] = x;
   };
 
@@ -751,7 +751,7 @@ void pkpsig_symmetric_expand_challenge1s(struct pkpsig_sigstate *sst, int verify
   for (i = 0; i < nruns; ++i) {
     uint32_t x = vecbuf[i];
     x = (x & 0xFFFFFF) + ((x >> 24) * reduce24);
-    x = pkpsig_modulus_modulo(&(ps->pkpparams->q), x);
+    x = pqcr_modulus_modulo(&(ps->pkpparams->q), x);
     vecbuf[i] = x;
   };
 

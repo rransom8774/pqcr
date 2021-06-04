@@ -54,7 +54,7 @@ int pkpsig_key_unpack_skblob_internal(struct pkpsig_scratch_store *st, struct pk
 
   /* fill in the public key vector */
   for (i = 0; i < m; ++i) st->vecbuf[i] = key->pub.u[i];
-  pkpsig_vectcoder_encode(key->pub.kp.ps->pkpparams->vc_pubkey_u,
+  pqcr_vectcoder_encode(key->pub.kp.ps->pkpparams->vc_pubkey_u,
                           key->pub.pkblob + keyfmt->bytes_pubparamseed,
                           st->vecbuf);
 
@@ -100,7 +100,7 @@ int pkpsig_key_unpack_pkblob(struct pkpsig_scratch_store *st, struct pkpsig_keyp
   pkpsig_symmetric_expand_A(st, &(pub->kp), pub->pkblob);
 
   /* decode the public key vector */
-  pkpsig_vectcoder_decode(ps->pkpparams->vc_pubkey_u, vecbuf, u_bytes);
+  pqcr_vectcoder_decode(ps->pkpparams->vc_pubkey_u, vecbuf, u_bytes);
 
   for (i = 0; i < m; ++i) {
     u[i] = vecbuf[i];

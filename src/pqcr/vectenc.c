@@ -97,13 +97,13 @@ static int compute_layer_merge(const struct vclayer_merge **ppmerge, vectelt *M,
   merge->has_odd_element = has_odd_element = (*pnelts) & 1;
 
   for (i = 0, j = 0; i < (*pnelts)-1; i += 2, j += 1) {
-    pkpsig_modulus_init(&(moduli[i]), M[i]);
-    pkpsig_modulus_init(&(moduli[i+1]), M[i+1]);
+    pqcr_modulus_init(&(moduli[i]), M[i]);
+    pqcr_modulus_init(&(moduli[i+1]), M[i+1]);
     M[j] = M[i] * M[i+1];
   };
 
   if (has_odd_element) {
-    pkpsig_modulus_init(&(moduli[i]), M[i]);
+    pqcr_modulus_init(&(moduli[i]), M[i]);
     M[j] = M[i];
     ++j;
   };
@@ -113,7 +113,7 @@ static int compute_layer_merge(const struct vclayer_merge **ppmerge, vectelt *M,
   return 0;
 };
 
-struct vectcoder *pkpsig_vectcoder_new(vectelt *Mbuf, size_t nelts) {
+struct vectcoder *pqcr_vectcoder_new(vectelt *Mbuf, size_t nelts) {
   struct vectcoder *rv = calloc(1, sizeof(struct vectcoder));
   struct vcstep *steps;
   size_t nsteps;
@@ -161,13 +161,13 @@ struct vectcoder *pkpsig_vectcoder_new(vectelt *Mbuf, size_t nelts) {
 
  err:
   if (rv != NULL) {
-    pkpsig_vectcoder_free(rv);
+    pqcr_vectcoder_free(rv);
   };
 
   return NULL;
 };
 
-struct vectcoder *pkpsig_vectcoder_new_uniform_bound(vectelt M, size_t nelts) {
+struct vectcoder *pqcr_vectcoder_new_uniform_bound(vectelt M, size_t nelts) {
   vectelt *Mbuf = calloc(nelts, sizeof(vectelt));
   struct vectcoder *rv;
   size_t i;
@@ -178,14 +178,14 @@ struct vectcoder *pkpsig_vectcoder_new_uniform_bound(vectelt M, size_t nelts) {
     Mbuf[i] = M;
   };
 
-  rv = pkpsig_vectcoder_new(Mbuf, nelts);
+  rv = pqcr_vectcoder_new(Mbuf, nelts);
 
   free(Mbuf);
 
   return rv;
 };
 
-void pkpsig_vectcoder_free(struct vectcoder *vc) {
+void pqcr_vectcoder_free(struct vectcoder *vc) {
   size_t i;
   if (vc != NULL) {
     if (vc->steps != NULL) {
@@ -212,14 +212,14 @@ void pkpsig_vectcoder_free(struct vectcoder *vc) {
   };
 };
 
-size_t pkpsig_vectcoder_get_nelts(const struct vectcoder *vc) {
+size_t pqcr_vectcoder_get_nelts(const struct vectcoder *vc) {
   if ((vc->nsteps != 0) && (vc->steps != NULL)) {
     return vc->steps[0].nelts_lower;
   };
   return 1;
 };
 
-size_t pkpsig_vectcoder_get_nbytes_separate_root(const struct vectcoder *vc) {
+size_t pqcr_vectcoder_get_nbytes_separate_root(const struct vectcoder *vc) {
   size_t nbytes = 0;
   size_t i;
 
@@ -232,12 +232,12 @@ size_t pkpsig_vectcoder_get_nbytes_separate_root(const struct vectcoder *vc) {
   return nbytes;
 };
 
-vectelt pkpsig_vectcoder_get_root_bound(const struct vectcoder *vc) {
+vectelt pqcr_vectcoder_get_root_bound(const struct vectcoder *vc) {
   return vc->root_bound;
 };
 
-size_t pkpsig_vectcoder_get_nbytes(const struct vectcoder *vc) {
-  return pkpsig_vectcoder_get_nbytes_separate_root(vc) + vc->root_bytes;
+size_t pqcr_vectcoder_get_nbytes(const struct vectcoder *vc) {
+  return pqcr_vectcoder_get_nbytes_separate_root(vc) + vc->root_bytes;
 };
 
 
@@ -279,7 +279,7 @@ static uint8_t *encode_apply_merge(const struct vcstep *step, uint8_t *S, vectel
   if (merge == NULL) return S;
 
   for (i = 0, j = 0; i < step->nelts_lower - 1; i += 2, j += 1) {
-    vectelt r = R[i] + pkpsig_modulus_mult(&(merge->moduli[i]), R[i+1]);
+    vectelt r = R[i] + pqcr_modulus_mult(&(merge->moduli[i]), R[i+1]);
     R[j] = r;
   };
 
@@ -304,11 +304,11 @@ static uint8_t *encode_separate_root_internal(const struct vectcoder *vc, uint8_
   return S;
 };
 
-void pkpsig_vectcoder_encode_separate_root(const struct vectcoder *vc, uint8_t *S, vectelt *root, vectelt *Rbuf) {
+void pqcr_vectcoder_encode_separate_root(const struct vectcoder *vc, uint8_t *S, vectelt *root, vectelt *Rbuf) {
   return (void)encode_separate_root_internal(vc, S, root, Rbuf);
 };
 
-void pkpsig_vectcoder_encode(const struct vectcoder *vc, uint8_t *S_, vectelt *Rbuf) {
+void pqcr_vectcoder_encode(const struct vectcoder *vc, uint8_t *S_, vectelt *Rbuf) {
   vectelt root = 0;
   uint8_t *S = encode_separate_root_internal(vc, S_, &root, Rbuf);
   size_t i, root_bytes;
@@ -376,9 +376,9 @@ static const uint8_t *decode_apply_merge(const struct vcstep *step, const uint8_
     i -= 2; j -= 1;
 
     r2 = R[j];
-    r2quot = pkpsig_modulus_divmod(&(merge->moduli[i]), &r2rem, r2);
+    r2quot = pqcr_modulus_divmod(&(merge->moduli[i]), &r2rem, r2);
     R[i] = r2rem;
-    R[i+1] = pkpsig_modulus_modulo(&(merge->moduli[i+1]), r2quot);
+    R[i+1] = pqcr_modulus_modulo(&(merge->moduli[i+1]), r2quot);
   } while (i != 0);
 
   return S;
@@ -420,16 +420,16 @@ static void decode_separate_root_internal(const struct vectcoder *vc, const uint
   };
 };
 
-void pkpsig_vectcoder_decode_separate_root(const struct vectcoder *vc, vectelt *R, const uint8_t *S, vectelt root) {
-  size_t nbytes_separate_root = pkpsig_vectcoder_get_nbytes_separate_root(vc);
+void pqcr_vectcoder_decode_separate_root(const struct vectcoder *vc, vectelt *R, const uint8_t *S, vectelt root) {
+  size_t nbytes_separate_root = pqcr_vectcoder_get_nbytes_separate_root(vc);
 
   R[0] = root;
 
   return decode_separate_root_internal(vc, S+nbytes_separate_root, R);
 };
 
-void pkpsig_vectcoder_decode(const struct vectcoder *vc, vectelt *R, const uint8_t *S) {
-  size_t nbytes = pkpsig_vectcoder_get_nbytes(vc);
+void pqcr_vectcoder_decode(const struct vectcoder *vc, vectelt *R, const uint8_t *S) {
+  size_t nbytes = pqcr_vectcoder_get_nbytes(vc);
   const uint8_t *S_ = S + nbytes;
   size_t i;
   vectelt root;

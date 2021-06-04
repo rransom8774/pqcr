@@ -38,7 +38,7 @@ void pkpsig_mult_vec_by_A(struct pkpsig_scratch_store *st, struct pkpsig_keypara
 
   /* modular reduction */
   for (i = 0; i < m; ++i) {
-    out[i] = pkpsig_modulus_modulo(&(kp->ps->pkpparams->q), st->vecbuf[i]);
+    out[i] = pqcr_modulus_modulo(&(kp->ps->pkpparams->q), st->vecbuf[i]);
   };
 };
 

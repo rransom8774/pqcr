@@ -82,7 +82,7 @@ static void init_pkp_param_set(size_t i, uint16_t q, uint8_t n, uint8_t m) {
 
   if ((n == 0) || (n > 128)) abort(); /* protect the stack */
 
-  if (pkpsig_modulus_init(&(pps->q), q) != 0) abort();
+  if (pqcr_modulus_init(&(pps->q), q) != 0) abort();
   pps->q_uniform_sampler_maxval = b32 - (b32 % (uint64_t)q) - 1;
   pps->q_reduce_2_24 = b24 % (uint32_t)q;
 
@@ -90,19 +90,19 @@ static void init_pkp_param_set(size_t i, uint16_t q, uint8_t n, uint8_t m) {
   pps->m = m;
   pps->n_padlen = pkpsig_sort_anyint32_get_pad_length(n);
 
-  pps->vc_pubkey_u = pkpsig_vectcoder_new_uniform_bound(q, m);
+  pps->vc_pubkey_u = pqcr_vectcoder_new_uniform_bound(q, m);
   if (pps->vc_pubkey_u == NULL) abort();
 
-  pps->vc_sig_z = pkpsig_vectcoder_new_uniform_bound(q, n);
+  pps->vc_sig_z = pqcr_vectcoder_new_uniform_bound(q, n);
   if (pps->vc_sig_z == NULL) abort();
 
-  pps->vc_sig_perm_unsquished = pkpsig_vectcoder_new_uniform_bound(n, n);
+  pps->vc_sig_perm_unsquished = pqcr_vectcoder_new_uniform_bound(n, n);
   if (pps->vc_sig_perm_unsquished == NULL) abort();
 
   for (j = 0; j < n-1; ++j) {
     M[j] = n - j;
   };
-  pps->vc_sig_perm_squished = pkpsig_vectcoder_new(M, n-1);
+  pps->vc_sig_perm_squished = pqcr_vectcoder_new(M, n-1);
   if (pps->vc_sig_perm_squished == NULL) abort();
 };
 
@@ -144,8 +144,8 @@ static void init_paramset(const char *name, enum paramset_enum i, int pkp, int k
     const struct vectcoder *vc_sig_perm =
       (squish ? ps->pkpparams->vc_sig_perm_squished :
        ps->pkpparams->vc_sig_perm_unsquished);
-    uint32_t z_root = pkpsig_vectcoder_get_root_bound(ps->pkpparams->vc_sig_z);
-    uint32_t perm_root = pkpsig_vectcoder_get_root_bound(vc_sig_perm);
+    uint32_t z_root = pqcr_vectcoder_get_root_bound(ps->pkpparams->vc_sig_z);
+    uint32_t perm_root = pqcr_vectcoder_get_root_bound(vc_sig_perm);
     int i;
 
     if (nruns_long > 164) abort(); /* protect the stack */
@@ -155,7 +155,7 @@ static void init_paramset(const char *name, enum paramset_enum i, int pkp, int k
       Mbuf[2*i + 1] = perm_root;
     };
 
-    ps->vc_runvec_heads = pkpsig_vectcoder_new(Mbuf, nruns_long*2);
+    ps->vc_runvec_heads = pqcr_vectcoder_new(Mbuf, nruns_long*2);
   } else {
     ps->vc_runvec_heads = NULL;
   };
@@ -288,7 +288,7 @@ size_t pkpsig_paramset_get_pkblob_bytes(const struct pkpsig_paramset *ps) {
   size_t rv;
 
   rv = ps->keyfmt->bytes_pubparamseed;
-  rv += pkpsig_vectcoder_get_nbytes(ps->pkpparams->vc_pubkey_u);
+  rv += pqcr_vectcoder_get_nbytes(ps->pkpparams->vc_pubkey_u);
 
   return rv;
 };
@@ -314,15 +314,15 @@ size_t pkpsig_paramset_get_sig_bytes(const struct pkpsig_paramset *ps) {
   size_t bytes_short = key_preimage_bytes * nruns_short;
   size_t (*vc_get_nbytes)(const struct vectcoder *vc) =
     (ps->merge_vect_roots ?
-     pkpsig_vectcoder_get_nbytes_separate_root :
-     pkpsig_vectcoder_get_nbytes);
+     pqcr_vectcoder_get_nbytes_separate_root :
+     pqcr_vectcoder_get_nbytes);
   size_t bytes_z = vc_get_nbytes(pkpparams->vc_sig_z);
   size_t bytes_perm = vc_get_nbytes(ps->squish_perms ?
                                     pkpparams->vc_sig_perm_squished :
                                     pkpparams->vc_sig_perm_unsquished);
   size_t bytes_long = (bytes_z + bytes_perm) * nruns_long;
   size_t bytes_heads = (ps->merge_vect_roots ?
-                        pkpsig_vectcoder_get_nbytes(ps->vc_runvec_heads) :
+                        pqcr_vectcoder_get_nbytes(ps->vc_runvec_heads) :
                         0);
   return (bytes_hashes + bytes_common + bytes_short + bytes_long + bytes_heads);
 };

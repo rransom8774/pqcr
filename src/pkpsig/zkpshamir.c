@@ -30,7 +30,7 @@ static void compute_z_from_blindingseed(const struct modulus *q_mod, size_t n, s
   for (j = 0; j < n; ++j) {
     uint32_t velt = run->v_pi_sigma[j];
     uint32_t c = run->c_and_b & 0x7FFF;
-    run->z[j] = pkpsig_modulus_modulo(q_mod, (c * velt) + (uint32_t)(run->r_sigma[j]));
+    run->z[j] = pqcr_modulus_modulo(q_mod, (c * velt) + (uint32_t)(run->r_sigma[j]));
   };
 };
 
@@ -111,11 +111,11 @@ void pkpsig_zkpshamir_encode_proofs(struct pkpsig_sigstate *sst, uint8_t *outbuf
   };
 
   if (merge_vect_roots) {
-    nbytes_z = pkpsig_vectcoder_get_nbytes_separate_root(vc_z);
-    nbytes_perm = pkpsig_vectcoder_get_nbytes_separate_root(vc_perm);
+    nbytes_z = pqcr_vectcoder_get_nbytes_separate_root(vc_z);
+    nbytes_perm = pqcr_vectcoder_get_nbytes_separate_root(vc_perm);
   } else {
-    nbytes_z = pkpsig_vectcoder_get_nbytes(vc_z);
-    nbytes_perm = pkpsig_vectcoder_get_nbytes(vc_perm);
+    nbytes_z = pqcr_vectcoder_get_nbytes(vc_z);
+    nbytes_perm = pqcr_vectcoder_get_nbytes(vc_perm);
   };
 
   pcommon = outbuf;
@@ -143,16 +143,16 @@ void pkpsig_zkpshamir_encode_proofs(struct pkpsig_sigstate *sst, uint8_t *outbuf
       };
 
       if (merge_vect_roots) {
-        pkpsig_vectcoder_encode_separate_root(vc_z, plong, proots, z_buf);
+        pqcr_vectcoder_encode_separate_root(vc_z, plong, proots, z_buf);
         plong += nbytes_z; ++proots;
 
-        pkpsig_vectcoder_encode_separate_root(vc_perm, plong, proots, perm_buf);
+        pqcr_vectcoder_encode_separate_root(vc_perm, plong, proots, perm_buf);
         plong += nbytes_perm; ++proots;
       } else {
-        pkpsig_vectcoder_encode(vc_z, plong, z_buf);
+        pqcr_vectcoder_encode(vc_z, plong, z_buf);
         plong += nbytes_z;
 
-        pkpsig_vectcoder_encode(vc_perm, plong, perm_buf);
+        pqcr_vectcoder_encode(vc_perm, plong, perm_buf);
         plong += nbytes_perm;
       };
     } else {
@@ -163,7 +163,7 @@ void pkpsig_zkpshamir_encode_proofs(struct pkpsig_sigstate *sst, uint8_t *outbuf
   };
 
   if (merge_vect_roots) {
-    pkpsig_vectcoder_encode(ps->vc_runvec_heads, plong, (uint32_t *)(st->treehash_buf));
+    pqcr_vectcoder_encode(ps->vc_runvec_heads, plong, (uint32_t *)(st->treehash_buf));
   };
 };
 
@@ -202,11 +202,11 @@ void pkpsig_zkpshamir_decode_proofs(struct pkpsig_sigstate *sst, const uint8_t *
   };
 
   if (merge_vect_roots) {
-    nbytes_z = pkpsig_vectcoder_get_nbytes_separate_root(vc_z);
-    nbytes_perm = pkpsig_vectcoder_get_nbytes_separate_root(vc_perm);
+    nbytes_z = pqcr_vectcoder_get_nbytes_separate_root(vc_z);
+    nbytes_perm = pqcr_vectcoder_get_nbytes_separate_root(vc_perm);
   } else {
-    nbytes_z = pkpsig_vectcoder_get_nbytes(vc_z);
-    nbytes_perm = pkpsig_vectcoder_get_nbytes(vc_perm);
+    nbytes_z = pqcr_vectcoder_get_nbytes(vc_z);
+    nbytes_perm = pqcr_vectcoder_get_nbytes(vc_perm);
   };
   nbytes_long = nbytes_z + nbytes_perm;
 
@@ -218,7 +218,7 @@ void pkpsig_zkpshamir_decode_proofs(struct pkpsig_sigstate *sst, const uint8_t *
 
   proots = (uint32_t *)(st->treehash_buf);
   if (merge_vect_roots) {
-    pkpsig_vectcoder_decode(ps->vc_runvec_heads,
+    pqcr_vectcoder_decode(ps->vc_runvec_heads,
                             proots,
                             plong + (nbytes_long * nruns_long));
   };
@@ -235,16 +235,16 @@ void pkpsig_zkpshamir_decode_proofs(struct pkpsig_sigstate *sst, const uint8_t *
     struct pkpsig_sigstate_run *run = &(sst->runs[i]);
 
     if (merge_vect_roots) {
-      pkpsig_vectcoder_decode_separate_root(vc_z, z_buf, plong, *proots);
+      pqcr_vectcoder_decode_separate_root(vc_z, z_buf, plong, *proots);
       plong += nbytes_z; ++proots;
 
-      pkpsig_vectcoder_decode_separate_root(vc_perm, perm_buf, plong, *proots);
+      pqcr_vectcoder_decode_separate_root(vc_perm, perm_buf, plong, *proots);
       plong += nbytes_perm; ++proots;
     } else {
-      pkpsig_vectcoder_decode(vc_z, z_buf, plong);
+      pqcr_vectcoder_decode(vc_z, z_buf, plong);
       plong += nbytes_z;
 
-      pkpsig_vectcoder_decode(vc_perm, perm_buf, plong);
+      pqcr_vectcoder_decode(vc_perm, perm_buf, plong);
       plong += nbytes_perm;
     };
 
@@ -302,7 +302,7 @@ void pkpsig_zkpshamir_regenerate_commits(struct pkpsig_sigstate *sst) {
     for (j = 0; j < m; ++j) {
       uint32_t c = run->c_and_b & 0x7FFF;
       uint32_t uelt = pub->u[j];
-      run->Ar[j] = pkpsig_modulus_modulo(mod, (big_zero - c*uelt) + (uint32_t)(run->Ar[j]));
+      run->Ar[j] = pqcr_modulus_modulo(mod, (big_zero - c*uelt) + (uint32_t)(run->Ar[j]));
     };
   };
   pkpsig_symmetric_gen_com1s(sst, 1);
