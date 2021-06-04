@@ -506,11 +506,11 @@ static size_t compute_treehash_buf_len_step(const struct pkpsig_paramset *ps, si
   /* This function makes no attempt to avoid integer overflow.  Do not
      pass unreasonable parameters to it. */
 
-  size_t key_crhash_bytes = ps->seclevel_keypair->crhash_bytes;
+  size_t sig_crhash_bytes = ps->seclevel_signature->crhash_bytes;
   size_t degree = ps->treehash_degree;
   size_t reduced_nodes = (nleaves / degree) + ((nleaves % degree) != 0);
 
-  return reduced_nodes * key_crhash_bytes;
+  return reduced_nodes * sig_crhash_bytes;
 };
 
 static size_t compute_treehash_buf_len(const struct pkpsig_paramset *ps) {
@@ -528,7 +528,7 @@ static size_t compute_treehash_buf_len(const struct pkpsig_paramset *ps) {
 
 static void tree_hash_prehash(struct pkpsig_scratch_store *st) {
   const struct pkpsig_paramset *ps = st->ps;
-  size_t key_crhash_bytes = ps->seclevel_keypair->crhash_bytes;
+  size_t sig_crhash_bytes = ps->seclevel_signature->crhash_bytes;
   size_t i;
   size_t leaf_bytes = st->treehash_node_bytes;
   size_t node_count = st->treehash_node_count;
@@ -541,7 +541,7 @@ static void tree_hash_prehash(struct pkpsig_scratch_store *st) {
       { index_buf, 4 },
       { NULL, leaf_bytes } };
 
-  if (leaf_bytes >= key_crhash_bytes) {
+  if (leaf_bytes >= sig_crhash_bytes) {
     /* There is room to pre-hash leaf nodes in place; no need to write into
        the node buffer yet. */
 
@@ -551,7 +551,7 @@ static void tree_hash_prehash(struct pkpsig_scratch_store *st) {
       pack_ui32(index_buf, leaf->key);
       chunks[4].buf = leaf->value;
 
-      st->algo->XOF_chunked_input(st, leaf->value, key_crhash_bytes, chunks, 5);
+      st->algo->XOF_chunked_input(st, leaf->value, sig_crhash_bytes, chunks, 5);
     };
   } else {
     /* Pre-hashing leaf nodes will make them bigger.  (Why would you
@@ -563,12 +563,12 @@ static void tree_hash_prehash(struct pkpsig_scratch_store *st) {
     abort();
   };
 
-  st->treehash_node_bytes = key_crhash_bytes;
+  st->treehash_node_bytes = sig_crhash_bytes;
 };
 
 static void tree_hash_level(struct pkpsig_scratch_store *st) {
   const struct pkpsig_paramset *ps = st->ps;
-  size_t key_crhash_bytes = ps->seclevel_keypair->crhash_bytes;
+  size_t sig_crhash_bytes = ps->seclevel_signature->crhash_bytes;
   uint8_t *ptr_out = st->treehash_buf;
   uint8_t *ptr_out_end;
   size_t i, idx_in, idx_out;
@@ -581,7 +581,7 @@ static void tree_hash_level(struct pkpsig_scratch_store *st) {
   /* The caller must initialize st->algo_state_prefix to contain the
      context, prefix string, and parameter string. */
 
-  ptr_out_end = ptr_out + key_crhash_bytes*( (node_count_in/degree) +
+  ptr_out_end = ptr_out + sig_crhash_bytes*( (node_count_in/degree) +
                                              ((node_count_in%degree)!=0) );
   assert(ptr_out_end <= st->treehash_buf + st->treehash_buf_bytes);
 
@@ -598,17 +598,17 @@ static void tree_hash_level(struct pkpsig_scratch_store *st) {
       ++i; ++idx_in;
     };
 
-    st->algo->expand(st, ptr_out, key_crhash_bytes);
+    st->algo->expand(st, ptr_out, sig_crhash_bytes);
     leaves[idx_out].key = header_index;
     leaves[idx_out].value = ptr_out;
     ++idx_out;
     ++header_index;
-    ptr_out += key_crhash_bytes;
+    ptr_out += sig_crhash_bytes;
   };
 
   assert(ptr_out == ptr_out_end);
 
-  st->treehash_node_bytes = key_crhash_bytes;
+  st->treehash_node_bytes = sig_crhash_bytes;
   st->treehash_node_count = idx_out;
   st->treehash_next_header_index = header_index;
 };
@@ -800,7 +800,7 @@ void pkpsig_symmetric_hash_commit2s(struct pkpsig_sigstate *sst, uint8_t *outbuf
   tree_hash_prehash(st);
 
   if (verifying) {
-    pkpsig_merge_runs_blob(leaves, nruns_short, nruns, key_crhash_bytes);
+    pkpsig_merge_runs_blob(leaves, nruns_short, nruns, sig_crhash_bytes);
   };
 
   tree_hash(st, outbuf, 1);
