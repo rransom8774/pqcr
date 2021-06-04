@@ -22,10 +22,11 @@ static size_t compute_treehash_degree(struct pkpsig_paramset *ps) {
      over into a fifth SHAKE256 input block.
 
      Each tree node is hashed to a length collision-resistant at the
-     keypair's security level, and each node's input also contains the
-     message hash and its salt (also keypair CR) and 12 bytes of
-     oracle separation data. */
-  return ((136*4 - 16) / ps->seclevel_keypair->crhash_bytes) - 2;
+     signature's security level.  Each node's input also contains the
+     message hash and its salt, which are CR at the keypair's security
+     level, and (currently) 12 bytes of oracle separation data. */
+  return ((136*4 - 16 - 2*ps->seclevel_keypair->crhash_bytes) /
+          ps->seclevel_signature->crhash_bytes);
 };
 
 static const struct pkpsig_seclevel seclevels[] =
