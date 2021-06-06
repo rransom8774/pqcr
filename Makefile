@@ -17,6 +17,10 @@ CFLAGS_PQCR = -Iinclude/pqcr/ \
 CFLAGS_PKPSIG = -Iinclude/pkpsig/ \
 	-Iinclude/pqcr/ \
 	-Iinclude/djbsort/ \
+	-Iinclude/ \
+	${CFLAGS} \
+
+CFLAGS_XOESCH = -Iinclude/ \
 	${CFLAGS} \
 
 CFLAGS_TEST = -Iinclude/ \
@@ -82,18 +86,27 @@ OBJS_PKPSIG = \
         out/pkpsig/sort_int32.o \
         out/pkpsig/symmetric_core.o \
         out/pkpsig/symmetric_shake256.o \
+        out/pkpsig/symmetric_xoesch256.o \
         out/pkpsig/zkpshamir.o \
+
+HEADERS_XOESCH = \
+	include/xoesch/xoesch.h \
+
+OBJS_XOESCH = \
+	out/xoesch/xoesch.o \
 
 
 HEADERS_LIB = \
 	$(HEADERS_DJBSORT) \
 	$(HEADERS_PQCR) \
 	$(HEADERS_PKPSIG) \
+	$(HEADERS_XOESCH) \
 
 OBJS_LIB = \
 	$(OBJS_DJBSORT) \
 	$(OBJS_PQCR) \
 	$(OBJS_PKPSIG) \
+	$(OBJS_XOESCH) \
 
 
 HEADERS_GEN_TEST_VECS = \
@@ -112,7 +125,7 @@ test-bin: build-dirs $(TESTPROGS)
 
 
 build-dirs:
-	mkdir -p out out/djbsort out/pkpsig out/pqcr out/test
+	mkdir -p out out/djbsort out/pkpsig out/pqcr out/test out/xoesch
 
 
 out/test/generate-test-vectors: $(OBJS_GEN_TEST_VECS) $(OBJS_LIB)
@@ -184,6 +197,13 @@ out/pkpsig/symmetric_core.o: src/pkpsig/symmetric_core.c $(HEADERS_PKPSIG)
 out/pkpsig/symmetric_shake256.o: src/pkpsig/symmetric_shake256.c $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
+out/pkpsig/symmetric_xoesch256.o: src/pkpsig/symmetric_xoesch256.c $(HEADERS_PKPSIG)
+	cc -c -o $@ $< $(CFLAGS_PKPSIG)
+
 out/pkpsig/zkpshamir.o: src/pkpsig/zkpshamir.c $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
+
+
+out/xoesch/xoesch.o: src/xoesch/xoesch.c $(HEADERS_XOESCH)
+	cc -c -o $@ $< $(CFLAGS_XOESCH)
 
