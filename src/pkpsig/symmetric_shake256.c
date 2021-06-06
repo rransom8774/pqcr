@@ -66,31 +66,6 @@ static void shake256_XOF_chunked_input(struct pkpsig_scratch_store *st, unsigned
   if (rv != 0) abort();
 };
 
-/* The SHAKE256 function in SimpleFIPS202.[hc] would be the simplest
-   way to implement the all-at-once XOF.  Unfortunately, that
-   allocates its sponge state on the stack, and compilers these days
-   are pretty good at preventing software from erasing secret data
-   stored on the stack. */
-/*
-static void shake256_XOF(struct pkpsig_scratch_store *st, unsigned char *output, size_t outputByteLen, const unsigned char *input, size_t inputByteLen) {
-  int rv = SHAKE256(output, outputByteLen, input, inputByteLen);
-  if (rv != 0) abort();
-};
-*/
-
-static void shake256_XOF(struct pkpsig_scratch_store *st, unsigned char *output, size_t outputByteLen, const unsigned char *input, size_t inputByteLen) {
-  KeccakWidth1600_SpongeInstance *hst = st->algo_state;
-  int rv = 0;
-
-  /* same magic numbers as above, for the same reasons */
-  rv |= KeccakWidth1600_SpongeInitialize(hst, 1088, 512);
-  rv |= KeccakWidth1600_SpongeAbsorb(hst, input, inputByteLen);
-  rv |= KeccakWidth1600_SpongeAbsorbLastFewBits(hst, 0x1F);
-  rv |= KeccakWidth1600_SpongeSqueeze(hst, output, outputByteLen);
-
-  if (rv != 0) abort();
-};
-
 static void shake256_hash_init(struct pkpsig_scratch_store *st, uint8_t context, const uint8_t *prefix, size_t prefix_len) {
   KeccakWidth1600_SpongeInstance *hst = st->algo_state_incremental;
   int rv = 0;
@@ -150,7 +125,7 @@ static void shake256_expand(struct pkpsig_scratch_store *st, uint8_t *output, si
 
 static const struct pkpsig_symmetric_algo symalg_keccak =
   {"shake256", sizeof(KeccakWidth1600_SpongeInstance),
-   shake256_XOF, shake256_XOF_chunked_input,
+   shake256_XOF_chunked_input,
    shake256_hash_init, shake256_hash_index, shake256_hash_chunk, shake256_hash_ui16vec,
    shake256_expand};
 

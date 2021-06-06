@@ -20,7 +20,6 @@ struct pkpsig_symmetric_algo {
   /* Chunk boundaries may or may not be preserved, depending on the
      underlying hash function or mode of operation. */
 
-  void (*XOF)(struct pkpsig_scratch_store *st, unsigned char *output, size_t outputByteLen, const unsigned char *input, size_t inputByteLen);
   void (*XOF_chunked_input)(struct pkpsig_scratch_store *st, unsigned char *output, size_t outputByteLen, const struct pkpsig_chunk *chunks, size_t chunkCount);
 
   void (*hash_init)(struct pkpsig_scratch_store *st, uint8_t context, const uint8_t *prefix, size_t prefix_len);
