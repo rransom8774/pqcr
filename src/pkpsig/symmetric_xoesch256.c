@@ -32,7 +32,7 @@ static void xoesch256_XOF_chunked_input(struct pkpsig_scratch_store *st, unsigne
 };
 
 static void xoesch256_hash_init(struct pkpsig_scratch_store *st, uint8_t context, const uint8_t *prefix, size_t prefix_len) {
-  struct xoesch256_state *hst = st->algo_state;
+  struct xoesch256_state *hst = st->algo_state_incremental;
   int rv = 0;
 
   xoesch256_init(hst);
@@ -44,7 +44,7 @@ static void xoesch256_hash_init(struct pkpsig_scratch_store *st, uint8_t context
 };
 
 static void xoesch256_hash_index(struct pkpsig_scratch_store *st, uint32_t index) {
-  struct xoesch256_state *hst = st->algo_state;
+  struct xoesch256_state *hst = st->algo_state_incremental;
   int rv;
   uint8_t buf[4];
 
@@ -55,13 +55,13 @@ static void xoesch256_hash_index(struct pkpsig_scratch_store *st, uint32_t index
 };
 
 static void xoesch256_hash_chunk(struct pkpsig_scratch_store *st, const uint8_t *chunk, size_t chunk_len) {
-  struct xoesch256_state *hst = st->algo_state;
+  struct xoesch256_state *hst = st->algo_state_incremental;
   int rv = xoesch256_update(hst, chunk, chunk_len);
   if (rv != 0) abort();
 };
 
 static void xoesch256_hash_ui16vec(struct pkpsig_scratch_store *st, const uint16_t *vec, size_t vec_len) {
-  struct xoesch256_state *hst = st->algo_state;
+  struct xoesch256_state *hst = st->algo_state_incremental;
   int rv;
 
   if (st->tmpbuf_bytes / 2 < vec_len) abort();
@@ -73,7 +73,7 @@ static void xoesch256_hash_ui16vec(struct pkpsig_scratch_store *st, const uint16
 };
 
 static void xoesch256_expand(struct pkpsig_scratch_store *st, uint8_t *output, size_t output_len) {
-  struct xoesch256_state *hst = st->algo_state;
+  struct xoesch256_state *hst = st->algo_state_incremental;
   int rv;
 
   rv = xoesch256_finish(hst, output, output_len);
