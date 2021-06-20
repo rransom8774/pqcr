@@ -87,6 +87,7 @@ OBJS_PKPSIG = \
         out/pkpsig/symmetric_core.o \
         out/pkpsig/symmetric_shake256.o \
         out/pkpsig/symmetric_xoesch256.o \
+        out/pkpsig/symmetric_xoesch384.o \
         out/pkpsig/zkpshamir.o \
 
 HEADERS_XOESCH = \
@@ -198,6 +199,9 @@ out/pkpsig/symmetric_shake256.o: src/pkpsig/symmetric_shake256.c $(HEADERS_PKPSI
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
 out/pkpsig/symmetric_xoesch256.o: src/pkpsig/symmetric_xoesch256.c $(HEADERS_PKPSIG)
+	cc -c -o $@ $< $(CFLAGS_PKPSIG)
+
+out/pkpsig/symmetric_xoesch384.o: src/pkpsig/symmetric_xoesch384.c $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
 out/pkpsig/zkpshamir.o: src/pkpsig/zkpshamir.c $(HEADERS_PKPSIG)
