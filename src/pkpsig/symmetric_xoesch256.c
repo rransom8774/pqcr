@@ -33,7 +33,14 @@ static void xoesch256_XOF_chunked_input(struct pkpsig_scratch_store *st, unsigne
 
 static void xoesch256_hash_init(struct pkpsig_scratch_store *st, uint8_t context, const uint8_t *prefix, size_t prefix_len) {
   struct xoesch256_state *hst = st->algo_state;
+  int rv = 0;
+
   xoesch256_init(hst);
+
+  rv |= xoesch256_update(hst, &context, 1);
+  rv |= xoesch256_update(hst, prefix, prefix_len);
+
+  if (rv != 0) abort();
 };
 
 static void xoesch256_hash_index(struct pkpsig_scratch_store *st, uint32_t index) {
