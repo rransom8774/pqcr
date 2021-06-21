@@ -362,12 +362,18 @@ struct enum_symalg_cbdata {
 static int enum_symalg_cb(void *ud, const char *symalg) {
   char name_buf[128];
   size_t name_len;
+  const struct pkpsig_symmetric_algo *algo = pkpsig_symmetric_algo_get(symalg);
   struct enum_symalg_cbdata *cbd = ud;
   const struct keyparams_data *kp = cbd->kp;
   pkpsig_paramset_enumerate_names_cb cb = cbd->cb;
   void *caller_ud = cbd->caller_ud;
+  const struct pkpsig_seclevel *ksl = &(seclevels[kp->i_key_seclevel]);
   const struct paramset_data *psd;
   int rv;
+
+  if (pkpsig_symmetric_algo_check_seclevel(algo, ksl->preimage_bytes, ksl->crhash_bytes) < 0) {
+    return 0;
+  };
 
   for (psd = kp->paramsets; psd->n_runs_short != 0; ++psd) {
     name_len = snprintf(name_buf, sizeof(name_buf), "%s-%s-s%s",
