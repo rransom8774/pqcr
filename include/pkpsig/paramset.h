@@ -63,8 +63,6 @@ struct pkpsig_paramset {
   const struct pkpsig_symmetric_algo *symmetric_algo;
 };
 
-void pkpsig_paramset_init();
-
 struct pkpsig_paramset *pkpsig_paramset_alloc_by_name(const char *name);
 void pkpsig_paramset_free(struct pkpsig_paramset *ps);
 
