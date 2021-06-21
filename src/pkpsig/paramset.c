@@ -229,7 +229,7 @@ static struct pkpsig_paramset *alloc_paramset_from_data(const struct keyparams_d
   name_len = snprintf(name_buf, sizeof(name_buf), "%s-%s-s%s%s%c",
                       kp->name, symalg, ps->seclevel_signature->name,
                       flag ? "-" : "", flag);
-  if (name_len > sizeof(name_buf - 1)) goto err;
+  if (name_len > sizeof(name_buf) - 1) goto err;
   ps->name = strdup(name_buf);
   if (ps->name == NULL) goto err;
 
@@ -278,6 +278,8 @@ static struct pkpsig_paramset *alloc_paramset_from_data(const struct keyparams_d
     ps->vc_runvec_heads = pqcr_vectcoder_new(M, nrl*2);
     if (ps->vc_runvec_heads == NULL) goto err;
   };
+
+  return ps;
 
  err:
   pkpsig_paramset_free(ps);
