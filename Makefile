@@ -192,16 +192,16 @@ out/pkpsig/sort_blob.o: src/pkpsig/sort_blob.c $(HEADERS_PKPSIG)
 out/pkpsig/sort_int32.o: src/pkpsig/sort_int32.c $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
-out/pkpsig/symmetric_core.o: src/pkpsig/symmetric_core.c src/pkpsig/symmetric_internal.h $(HEADERS_PKPSIG)
+out/pkpsig/symmetric_core.o: src/pkpsig/symmetric_core.c src/pkpsig/symmetric_internal.h src/pkpsig/symmetric_endian.h $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
-out/pkpsig/symmetric_shake256.o: src/pkpsig/symmetric_shake256.c src/pkpsig/symmetric_internal.h $(HEADERS_PKPSIG)
+out/pkpsig/symmetric_shake256.o: src/pkpsig/symmetric_shake256.c src/pkpsig/symmetric_internal.h src/pkpsig/symmetric_endian.h $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
-out/pkpsig/symmetric_xoesch256.o: src/pkpsig/symmetric_xoesch256.c src/pkpsig/symmetric_internal.h $(HEADERS_PKPSIG)
+out/pkpsig/symmetric_xoesch256.o: src/pkpsig/symmetric_xoesch256.c src/pkpsig/symmetric_internal.h src/pkpsig/symmetric_endian.h $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
-out/pkpsig/symmetric_xoesch384.o: src/pkpsig/symmetric_xoesch384.c src/pkpsig/symmetric_internal.h $(HEADERS_PKPSIG)
+out/pkpsig/symmetric_xoesch384.o: src/pkpsig/symmetric_xoesch384.c src/pkpsig/symmetric_internal.h src/pkpsig/symmetric_endian.h $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
 out/pkpsig/zkpshamir.o: src/pkpsig/zkpshamir.c $(HEADERS_PKPSIG)
