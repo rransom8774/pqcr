@@ -261,14 +261,15 @@ static struct pkpsig_paramset *alloc_paramset_from_data(const struct keyparams_d
   if (ps->merge_vect_roots) {
     size_t nrl = ps->nruns_long;
     size_t i;
-    vectelt M[164];
+#define MAX_N_RUNS_LONG 164
+    vectelt M[MAX_N_RUNS_LONG*2];
     const struct vectcoder *vc_sig_perm =
       (ps->squish_perms ? ps->pkpparams->vc_sig_perm_squished :
        ps->pkpparams->vc_sig_perm_unsquished);
     uint32_t z_root = pqcr_vectcoder_get_root_bound(ps->pkpparams->vc_sig_z);
     uint32_t perm_root = pqcr_vectcoder_get_root_bound(vc_sig_perm);
 
-    if (nrl > 164/2) goto err;
+    if (nrl > MAX_N_RUNS_LONG) goto err;
 
     for (i = 0; i < nrl; ++i) {
       M[2*i + 0] = z_root;
