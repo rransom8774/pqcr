@@ -83,6 +83,7 @@ static void xoesch384_expand(struct pkpsig_scratch_store *st, uint8_t *output, s
 
 static struct pkpsig_symmetric_algo symalg_xoesch384 =
   {"xoesch384", 0,
+   48, 48,
    xoesch384_XOF_chunked_input,
    xoesch384_hash_init, xoesch384_hash_index, xoesch384_hash_chunk, xoesch384_hash_ui16vec,
    xoesch384_expand};

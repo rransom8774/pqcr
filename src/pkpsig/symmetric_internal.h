@@ -17,6 +17,9 @@ struct pkpsig_symmetric_algo {
   const char *name;
   size_t state_bytes;
 
+  uint8_t max_seclevel_preimage_bytes;
+  uint8_t max_seclevel_crhash_bytes;
+
   /* Chunk boundaries may or may not be preserved, depending on the
      underlying hash function or mode of operation. */
 
