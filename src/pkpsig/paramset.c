@@ -226,6 +226,10 @@ static struct pkpsig_paramset *alloc_paramset_from_data(const struct keyparams_d
   ps->seclevel_keypair = &(seclevels[kp->i_key_seclevel]);
   ps->seclevel_signature = &(seclevels[psd->i_sig_seclevel]);
 
+  if (pkpsig_symmetric_algo_check_seclevel(ps->symmetric_algo, ps->seclevel_keypair->preimage_bytes, ps->seclevel_signature->crhash_bytes) < 0) {
+    goto err;
+  };
+
   name_len = snprintf(name_buf, sizeof(name_buf), "%s-%s-s%s%s%c",
                       kp->name, symalg, ps->seclevel_signature->name,
                       flag ? "-" : "", flag);

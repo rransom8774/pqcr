@@ -53,6 +53,12 @@ size_t pkpsig_symmetric_algo_state_bytes(const struct pkpsig_symmetric_algo *alg
   return algo->state_bytes;
 };
 
+int pkpsig_symmetric_algo_check_seclevel(const struct pkpsig_symmetric_algo *algo, int preimage_bytes, int crhash_bytes) {
+  if (preimage_bytes > algo->max_seclevel_preimage_bytes) return -1;
+  if (crhash_bytes > algo->max_seclevel_crhash_bytes) return -1;
+  return 0;
+};
+
 struct pkpsig_scratch_store *pkpsig_scratch_store_new(const struct pkpsig_symmetric_algo *algo) {
   struct pkpsig_scratch_store *rv = calloc(1, sizeof(struct pkpsig_scratch_store));
 
