@@ -278,12 +278,14 @@ int pkpsig_symmetric_expand_v(struct pkpsig_scratch_store *st, struct pkpsig_key
 
   (void)expand_fqvec(st, kp->ps, kp->v, n, 0);
 
-  /* check for distinct elements */
-  /* relies on expand_fqvec leaving v in vecbuf */
-  padlen = pkpsig_sort_posint32_pad_sortbuf(st->vecbuf, n);
-  pkpsig_sort_posint32(st->vecbuf, padlen);
-  for (i = 1; i < n; ++i) {
-    if (st->vecbuf[i-1] == st->vecbuf[i]) return -1;
+  if (check_distinct) {
+    /* check for distinct elements */
+    /* relies on expand_fqvec leaving v in vecbuf */
+    padlen = pkpsig_sort_posint32_pad_sortbuf(st->vecbuf, n);
+    pkpsig_sort_posint32(st->vecbuf, padlen);
+    for (i = 1; i < n; ++i) {
+      if (st->vecbuf[i-1] == st->vecbuf[i]) return -1;
+    };
   };
   return 0;
 };
