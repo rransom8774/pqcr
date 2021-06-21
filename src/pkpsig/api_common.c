@@ -12,6 +12,6 @@
 #include "paramset.h"
 
 void pkpsig_init() {
-  return pkpsig_paramset_init();
+  /* no-op; to be removed */
 };
 

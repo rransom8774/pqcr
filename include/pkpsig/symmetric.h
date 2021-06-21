@@ -48,7 +48,10 @@ struct pkpsig_scratch_store { /* one per thread */
   size_t treehash_prefix_bytes;
 };
 
+typedef int (*pkpsig_symmetric_algo_enumerate_names_cb)(void *ud, const char *name);
+
 const struct pkpsig_symmetric_algo *pkpsig_symmetric_algo_get(const char *name);
+int pkpsig_symmetric_algo_enumerate_names(pkpsig_symmetric_algo_enumerate_names_cb cb, void *ud);
 const char *pkpsig_symmetric_algo_name(const struct pkpsig_symmetric_algo *algo);
 size_t pkpsig_symmetric_algo_state_bytes(const struct pkpsig_symmetric_algo *algo);
 

@@ -28,10 +28,10 @@ struct pkpsig_pkpparams {
   uint8_t n, m; /* m < n; n <= 128 */
   size_t n_padlen;
 
-  const struct vectcoder *vc_pubkey_u;
-  const struct vectcoder *vc_sig_z;
-  const struct vectcoder *vc_sig_perm_unsquished;
-  const struct vectcoder *vc_sig_perm_squished;
+  struct vectcoder *vc_pubkey_u;
+  struct vectcoder *vc_sig_z;
+  struct vectcoder *vc_sig_perm_unsquished;
+  struct vectcoder *vc_sig_perm_squished;
 };
 
 struct pkpsig_keyfmt {
@@ -44,8 +44,8 @@ struct pkpsig_keyfmt {
 };
 
 struct pkpsig_paramset {
-  const char *name;
-  const struct pkpsig_pkpparams *pkpparams;
+  char *name;
+  struct pkpsig_pkpparams *pkpparams;
 
   const struct pkpsig_keyfmt *keyfmt;
   const struct pkpsig_seclevel *seclevel_keypair;
@@ -58,19 +58,18 @@ struct pkpsig_paramset {
   uint8_t squish_perms;
   uint8_t merge_vect_roots;
 
-  const struct vectcoder *vc_runvec_heads;
+  struct vectcoder *vc_runvec_heads;
 
   const struct pkpsig_symmetric_algo *symmetric_algo;
 };
 
 void pkpsig_paramset_init();
 
-const struct pkpsig_paramset *pkpsig_paramset_get_by_name(const char *name);
+struct pkpsig_paramset *pkpsig_paramset_alloc_by_name(const char *name);
+void pkpsig_paramset_free(struct pkpsig_paramset *ps);
 
 typedef int (*pkpsig_paramset_enumerate_names_cb)(void *ud, const char *name);
-typedef int (*pkpsig_paramset_enumerate_cb)(void *ud, const struct pkpsig_paramset *ps);
 
-int pkpsig_paramset_enumerate(pkpsig_paramset_enumerate_cb cb, void *ud);
 int pkpsig_paramset_enumerate_names(pkpsig_paramset_enumerate_names_cb cb, void *ud);
 
 size_t pkpsig_paramset_get_pkblob_bytes(const struct pkpsig_paramset *ps);

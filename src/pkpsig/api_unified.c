@@ -19,25 +19,34 @@
 #include <string.h>
 
 ssize_t pkpsig_simple_get_publickey_bytes(const char *paramset_name) {
-  const struct pkpsig_paramset *ps = pkpsig_paramset_get_by_name(paramset_name);
+  ssize_t rv;
+  struct pkpsig_paramset *ps = pkpsig_paramset_alloc_by_name(paramset_name);
   if (ps == NULL) return -2;
-  return pkpsig_paramset_get_pkblob_bytes(ps);
+  rv = pkpsig_paramset_get_pkblob_bytes(ps);
+  pkpsig_paramset_free(ps);
+  return rv;
 };
 
 ssize_t pkpsig_simple_get_secretkey_bytes(const char *paramset_name) {
-  const struct pkpsig_paramset *ps = pkpsig_paramset_get_by_name(paramset_name);
+  ssize_t rv;
+  struct pkpsig_paramset *ps = pkpsig_paramset_alloc_by_name(paramset_name);
   if (ps == NULL) return -2;
-  return pkpsig_paramset_get_skblob_bytes(ps);
+  rv = pkpsig_paramset_get_skblob_bytes(ps);
+  pkpsig_paramset_free(ps);
+  return rv;
 };
 
 ssize_t pkpsig_simple_get_signature_bytes(const char *paramset_name) {
-  const struct pkpsig_paramset *ps = pkpsig_paramset_get_by_name(paramset_name);
+  ssize_t rv;
+  struct pkpsig_paramset *ps = pkpsig_paramset_alloc_by_name(paramset_name);
   if (ps == NULL) return -2;
-  return pkpsig_paramset_get_sig_bytes(ps);
+  rv = pkpsig_paramset_get_sig_bytes(ps);
+  pkpsig_paramset_free(ps);
+  return rv;
 };
 
 int pkpsig_simple_keypair(const char *paramset_name, uint8_t *publickey_out, uint8_t *secretkey_out) {
-  const struct pkpsig_paramset *ps = pkpsig_paramset_get_by_name(paramset_name);
+  struct pkpsig_paramset *ps = pkpsig_paramset_alloc_by_name(paramset_name);
   struct pkpsig_scratch_store *st = NULL;
   struct pkpsig_keysecret *key = NULL;
   size_t pkblob_bytes;
@@ -82,11 +91,12 @@ int pkpsig_simple_keypair(const char *paramset_name, uint8_t *publickey_out, uin
  end:
   pkpsig_key_secret_free(key);
   pkpsig_scratch_store_free(st);
+  pkpsig_paramset_free(ps);
   return rv;
 };
 
 int pkpsig_simple_detached_sign(const char *paramset_name, uint8_t *sigout, const uint8_t *msg, size_t msglen, const uint8_t *secretkey) {
-  const struct pkpsig_paramset *ps = pkpsig_paramset_get_by_name(paramset_name);
+  struct pkpsig_paramset *ps = pkpsig_paramset_alloc_by_name(paramset_name);
   struct pkpsig_scratch_store *st = NULL;
   struct pkpsig_keysecret *key = NULL;
   struct pkpsig_sigstate *sst = NULL;
@@ -138,11 +148,12 @@ int pkpsig_simple_detached_sign(const char *paramset_name, uint8_t *sigout, cons
   pkpsig_sigstate_free(sst);
   pkpsig_key_secret_free(key);
   pkpsig_scratch_store_free(st);
+  pkpsig_paramset_free(ps);
   return rv;
 };
 
 int pkpsig_simple_detached_verify(const char *paramset_name, const uint8_t *sigin, const uint8_t *msg, size_t msglen, const uint8_t *publickey) {
-  const struct pkpsig_paramset *ps = pkpsig_paramset_get_by_name(paramset_name);
+  struct pkpsig_paramset *ps = pkpsig_paramset_alloc_by_name(paramset_name);
   struct pkpsig_scratch_store *st = NULL;
   struct pkpsig_keypublic *pub = NULL;
   struct pkpsig_sigstate *sst = NULL;
@@ -194,6 +205,7 @@ int pkpsig_simple_detached_verify(const char *paramset_name, const uint8_t *sigi
   pkpsig_sigstate_free(sst);
   pkpsig_key_public_free(pub);
   pkpsig_scratch_store_free(st);
+  pkpsig_paramset_free(ps);
   return rv;
 };
 
