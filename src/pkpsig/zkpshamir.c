@@ -287,7 +287,7 @@ void pkpsig_zkpshamir_regenerate_commits(struct pkpsig_sigstate *sst) {
 
   /* _mult_vec_by_A will clobber the padding which
      pkpsig_permute_prepare puts into vecbuf if m > n.  But note that
-     m> = n makes key recovery trivial. */
+     m >= n makes key recovery trivial. */
   assert(st->ps->pkpparams->m <= st->ps->pkpparams->n);
 
   /* long-proof runs */
