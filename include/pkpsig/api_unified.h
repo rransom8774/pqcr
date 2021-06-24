@@ -15,8 +15,6 @@
 
 #include <sys/types.h>
 
-#include "api_common.h"
-
 ssize_t pkpsig_simple_get_publickey_bytes(const char *paramset_name);
 ssize_t pkpsig_simple_get_secretkey_bytes(const char *paramset_name);
 ssize_t pkpsig_simple_get_signature_bytes(const char *paramset_name);

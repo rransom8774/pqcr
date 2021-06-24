@@ -58,7 +58,6 @@ OBJS_PQCR = \
 
 
 HEADERS_PKPSIG = \
-        include/pkpsig/api_common.h \
         include/pkpsig/api_unified.h \
         include/pkpsig/keys.h \
         include/pkpsig/paramset.h \
@@ -71,7 +70,6 @@ HEADERS_PKPSIG = \
         include/pkpsig/zkpshamir.h \
 
 OBJS_PKPSIG = \
-	out/pkpsig/api_common.o \
 	out/pkpsig/api_unified.o \
         out/pkpsig/keys_core.o \
         out/pkpsig/keys_generate.o \
@@ -152,9 +150,6 @@ out/pqcr/modulo.o: src/pqcr/modulo.c $(HEADERS_PQCR)
 out/pqcr/vectenc.o: src/pqcr/vectenc.c $(HEADERS_PQCR)
 	cc -c -o $@ $< $(CFLAGS_PQCR)
 
-
-out/pkpsig/api_common.o: src/pkpsig/api_common.c $(HEADERS_PKPSIG)
-	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
 out/pkpsig/api_unified.o: src/pkpsig/api_unified.c $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)

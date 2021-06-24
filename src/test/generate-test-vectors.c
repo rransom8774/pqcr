@@ -15,7 +15,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <pkpsig/api_common.h>
 #include <pkpsig/api_unified.h>
 #include <pkpsig/paramset.h>
 
@@ -229,8 +228,6 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "usage: generate-test-vectors PARAMSET-NAME\n");
     return 2;
   };
-
-  pkpsig_init();
 
   /* mode 0777: rely on the user's umask for consistency with other programs */
   mkdir("out", 0777);
