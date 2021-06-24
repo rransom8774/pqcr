@@ -34,12 +34,16 @@ const struct pkpsig_symmetric_algo *pkpsig_symmetric_algo_get(const char *name) 
 };
 
 int pkpsig_symmetric_algo_enumerate_names(pkpsig_symmetric_algo_enumerate_names_cb cb, void *ud) {
+  static const char * const names[] = {
+    "shake256", "xoesch256", "xoesch384", NULL
+  };
   int rv;
   int i;
 
-  rv = cb(ud, "shake256"); if (rv != 0) return rv;
-  rv = cb(ud, "xoesch256"); if (rv != 0) return rv;
-  rv = cb(ud, "xoesch384"); if (rv != 0) return rv;
+  for (i = 0; names[i] != NULL; ++i) {
+    if (pkpsig_symmetric_algo_get(names[i]) == NULL) continue;
+    rv = cb(ud, names[i]); if (rv != 0) return rv;
+  };
 
   return 0;
 };
