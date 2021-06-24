@@ -171,7 +171,7 @@ out/pkpsig/keys_math.o: src/pkpsig/keys_math.c $(HEADERS_PKPSIG)
 out/pkpsig/keys_unpack.o: src/pkpsig/keys_unpack.c $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
-out/pkpsig/paramset.o: src/pkpsig/paramset.c src/pkpsig/paramset_list.h $(HEADERS_PKPSIG)
+out/pkpsig/paramset.o: src/pkpsig/paramset.c $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
 out/pkpsig/permute.o: src/pkpsig/permute.c $(HEADERS_PKPSIG)
