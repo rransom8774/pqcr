@@ -20,6 +20,12 @@ struct pkpsig_symmetric_algo {
   uint8_t max_seclevel_preimage_bytes;
   uint8_t max_seclevel_crhash_bytes;
 
+  int (*algo_state_alloc)(struct pkpsig_scratch_store *st);
+  void (*algo_state_set_prefix)(struct pkpsig_scratch_store *st);
+  void (*algo_state_use_prefix)(struct pkpsig_scratch_store *st);
+  void (*algo_state_zero)(struct pkpsig_scratch_store *st);
+  void (*algo_state_free)(struct pkpsig_scratch_store *st);
+
   /* Chunk boundaries may or may not be preserved, depending on the
      underlying hash function or mode of operation. */
 
@@ -35,6 +41,12 @@ struct pkpsig_symmetric_algo {
 const struct pkpsig_symmetric_algo *pkpsig_symmetric_algo_get_shake256();
 const struct pkpsig_symmetric_algo *pkpsig_symmetric_algo_get_xoesch256();
 const struct pkpsig_symmetric_algo *pkpsig_symmetric_algo_get_xoesch384();
+
+int pkpsig_generic_algo_state_alloc(struct pkpsig_scratch_store *st);
+void pkpsig_generic_algo_state_set_prefix(struct pkpsig_scratch_store *st);
+void pkpsig_generic_algo_state_use_prefix(struct pkpsig_scratch_store *st);
+void pkpsig_generic_algo_state_zero(struct pkpsig_scratch_store *st);
+void pkpsig_generic_algo_state_free(struct pkpsig_scratch_store *st);
 
 void pkpsig_scratch_store_set_prefix(struct pkpsig_scratch_store *st);
 void pkpsig_scratch_store_use_prefix(struct pkpsig_scratch_store *st);

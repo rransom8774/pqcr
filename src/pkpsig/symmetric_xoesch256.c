@@ -84,6 +84,11 @@ static void xoesch256_expand(struct pkpsig_scratch_store *st, uint8_t *output, s
 static struct pkpsig_symmetric_algo symalg_xoesch256 =
   {"xoesch256", 0,
    32, 32,
+   pkpsig_generic_algo_state_alloc,
+   pkpsig_generic_algo_state_set_prefix,
+   pkpsig_generic_algo_state_use_prefix,
+   pkpsig_generic_algo_state_zero,
+   pkpsig_generic_algo_state_free,
    xoesch256_XOF_chunked_input,
    xoesch256_hash_init, xoesch256_hash_index, xoesch256_hash_chunk, xoesch256_hash_ui16vec,
    xoesch256_expand};

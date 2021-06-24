@@ -160,22 +160,34 @@ void pkpsig_scratch_store_set_paramset(struct pkpsig_scratch_store *st, const st
   pack_ui16(st->treehash_params + 5, ps->nruns_long);
 };
 
-int pkpsig_scratch_store_alloc_bufs(struct pkpsig_scratch_store *st) {
-  pkpsig_scratch_store_free_bufs(st);
-
+int pkpsig_generic_algo_state_alloc(struct pkpsig_scratch_store *st) {
   st->algo_state = calloc(st->algo->state_bytes, sizeof(uint8_t));
   st->algo_state_incremental = calloc(st->algo->state_bytes, sizeof(uint8_t));
   st->algo_state_prefix = calloc(st->algo->state_bytes, sizeof(uint8_t));
+
+  if ((st->algo_state == NULL) ||
+      (st->algo_state_incremental == NULL) ||
+      (st->algo_state_prefix == NULL)) {
+    return -1;
+  };
+  return 0;
+};
+
+int pkpsig_scratch_store_alloc_bufs(struct pkpsig_scratch_store *st) {
+  int rv;
+
+  pkpsig_scratch_store_free_bufs(st);
+
+  rv = st->algo->algo_state_alloc(st);
+  if (rv < 0) return -1;
+
   st->outputbuf = calloc(st->output_bytes, sizeof(uint8_t));
   st->tmpbuf = calloc(st->tmpbuf_bytes, sizeof(uint8_t));
   st->vecbuf = calloc(st->vec_elts, sizeof(uint32_t));
   st->treehash_buf = calloc(st->treehash_buf_bytes, sizeof(uint8_t));
   st->treehash_leaves = calloc(st->treehash_leaf_count, sizeof(struct pkpsig_sort_blob));
 
-  if ((st->algo_state == NULL) ||
-      (st->algo_state_incremental == NULL) ||
-      (st->algo_state_prefix == NULL) ||
-      (st->outputbuf == NULL) ||
+  if ((st->outputbuf == NULL) ||
       (st->tmpbuf == NULL) ||
       (st->vecbuf == NULL) ||
       (st->treehash_buf == NULL) ||
@@ -185,10 +197,14 @@ int pkpsig_scratch_store_alloc_bufs(struct pkpsig_scratch_store *st) {
   return 0;
 };
 
+void pkpsig_scratch_store_zero_algo_state(struct pkpsig_scratch_store *st) {
+  st->algo->algo_state_zero(st);
+};
+
 /* random macro name */
 #define aerlqxz(buf_field, len_field) memset(st->buf_field, 0, st->len_field)
 
-void pkpsig_scratch_store_zero_algo_state(struct pkpsig_scratch_store *st) {
+void pkpsig_generic_algo_state_zero(struct pkpsig_scratch_store *st) {
   aerlqxz(algo_state, algo->state_bytes);
   aerlqxz(algo_state_incremental, algo->state_bytes);
   aerlqxz(algo_state_prefix, algo->state_bytes);
@@ -213,14 +229,18 @@ void pkpsig_scratch_store_free_bufs(struct pkpsig_scratch_store *st) {
     st->field = NULL;                           \
   }
 
-  olbhqtn(algo_state);
-  olbhqtn(algo_state_incremental);
-  olbhqtn(algo_state_prefix);
+  st->algo->algo_state_free(st);
   olbhqtn(outputbuf);
   olbhqtn(tmpbuf);
   olbhqtn(vecbuf);
   olbhqtn(treehash_buf);
   olbhqtn(treehash_leaves);
+};
+
+void pkpsig_generic_algo_state_free(struct pkpsig_scratch_store *st) {
+  olbhqtn(algo_state);
+  olbhqtn(algo_state_incremental);
+  olbhqtn(algo_state_prefix);
 
 #undef olbhqtn
 };
@@ -234,10 +254,18 @@ void pkpsig_scratch_store_free(struct pkpsig_scratch_store *st) {
 };
 
 void pkpsig_scratch_store_set_prefix(struct pkpsig_scratch_store *st) {
-  memcpy(st->algo_state_prefix, st->algo_state_incremental, st->algo->state_bytes);
+  st->algo->algo_state_set_prefix(st);
 };
 
 void pkpsig_scratch_store_use_prefix(struct pkpsig_scratch_store *st) {
+  st->algo->algo_state_use_prefix(st);
+};
+
+void pkpsig_generic_algo_state_set_prefix(struct pkpsig_scratch_store *st) {
+  memcpy(st->algo_state_prefix, st->algo_state_incremental, st->algo->state_bytes);
+};
+
+void pkpsig_generic_algo_state_use_prefix(struct pkpsig_scratch_store *st) {
   memcpy(st->algo_state_incremental, st->algo_state_prefix, st->algo->state_bytes);
 };
 
