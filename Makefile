@@ -82,10 +82,13 @@ OBJS_PKPSIG = \
 	out/pkpsig/sort_blob.o \
 	out/pkpsig/sort_int32.o \
 	out/pkpsig/symmetric_core.o \
-	out/pkpsig/symmetric_shake256.o \
 	out/pkpsig/symmetric_xoesch256.o \
 	out/pkpsig/symmetric_xoesch384.o \
 	out/pkpsig/zkpshamir.o \
+
+OBJS_PKPSIG_XKCP = \
+	out/pkpsig/symmetric_shake_xkcp.o \
+
 
 HEADERS_XOESCH = \
 	include/xoesch/xoesch.h \
@@ -105,6 +108,10 @@ OBJS_LIB = \
 	$(OBJS_PQCR) \
 	$(OBJS_PKPSIG) \
 	$(OBJS_XOESCH) \
+
+OBJS_LIB_XKCP = \
+	$(OBJS_LIB) \
+	$(OBJS_PKPSIG_XKCP) \
 
 
 HEADERS_GEN_TEST_VECS = \
@@ -126,7 +133,7 @@ build-dirs:
 	mkdir -p out out/djbsort out/pkpsig out/pqcr out/test out/xoesch
 
 
-out/test/generate-test-vectors: $(OBJS_GEN_TEST_VECS) $(OBJS_LIB)
+out/test/generate-test-vectors: $(OBJS_GEN_TEST_VECS) $(OBJS_LIB_XKCP)
 	$(CC) -o $@ $+ $(LDFLAGS_TEST)
 
 out/test/randombytes_shake256_deterministic.o: src/test/randombytes_shake256_deterministic.c $(HEADERS_GEN_TEST_VECS)
@@ -189,7 +196,7 @@ out/pkpsig/sort_int32.o: src/pkpsig/sort_int32.c $(HEADERS_PKPSIG)
 out/pkpsig/symmetric_core.o: src/pkpsig/symmetric_core.c src/pkpsig/symmetric_internal.h src/pkpsig/symmetric_endian.h $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
-out/pkpsig/symmetric_shake256.o: src/pkpsig/symmetric_shake256.c src/pkpsig/symmetric_internal.h src/pkpsig/symmetric_endian.h $(HEADERS_PKPSIG)
+out/pkpsig/symmetric_shake_xkcp.o: src/pkpsig/symmetric_shake_xkcp.c src/pkpsig/symmetric_internal.h src/pkpsig/symmetric_endian.h $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
 out/pkpsig/symmetric_xoesch256.o: src/pkpsig/symmetric_xoesch256.c src/pkpsig/symmetric_internal.h src/pkpsig/symmetric_endian.h $(HEADERS_PKPSIG)
