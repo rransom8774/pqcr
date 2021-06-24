@@ -28,14 +28,21 @@ CFLAGS_TEST = -Iinclude/ \
 	${CFLAGS} \
 
 
-LIBS = -lXKCP \
+LIBS_XKCP = -lXKCP \
 
-LIBS_TEST = ${LIBS} \
+LIBS_TEST_XKCP = ${LIBS_XKCP} \
+
+LIBS_OPENSSL = -lcrypto \
+
+LIBS_TEST_OPENSSL = ${LIBS_XKCP} \
+	${LIBS_OPENSSL} \
 
 
 LDFLAGS = -g
 
-LDFLAGS_TEST = ${LDFLAGS} ${LIBS_TEST}
+LDFLAGS_TEST_XKCP = ${LDFLAGS} ${LIBS_TEST_XKCP}
+
+LDFLAGS_TEST_OPENSSL = ${LDFLAGS} ${LIBS_TEST_OPENSSL}
 
 
 HEADERS_DJBSORT = \
@@ -89,6 +96,9 @@ OBJS_PKPSIG = \
 OBJS_PKPSIG_XKCP = \
 	out/pkpsig/symmetric_shake_xkcp.o \
 
+OBJS_PKPSIG_OPENSSL = \
+	out/pkpsig/symmetric_shake_openssl.o \
+
 
 HEADERS_XOESCH = \
 	include/xoesch/xoesch.h \
@@ -113,6 +123,10 @@ OBJS_LIB_XKCP = \
 	$(OBJS_LIB) \
 	$(OBJS_PKPSIG_XKCP) \
 
+OBJS_LIB_OPENSSL = \
+	$(OBJS_LIB) \
+	$(OBJS_PKPSIG_OPENSSL) \
+
 
 HEADERS_GEN_TEST_VECS = \
 	src/test/randombytes_shake256_deterministic.h \
@@ -124,6 +138,7 @@ OBJS_GEN_TEST_VECS = \
 
 TESTPROGS = \
 	out/test/generate-test-vectors \
+	out/test/generate-test-vectors-openssl \
 
 
 test-bin: build-dirs $(TESTPROGS)
@@ -134,7 +149,10 @@ build-dirs:
 
 
 out/test/generate-test-vectors: $(OBJS_GEN_TEST_VECS) $(OBJS_LIB_XKCP)
-	$(CC) -o $@ $+ $(LDFLAGS_TEST)
+	$(CC) -o $@ $+ $(LDFLAGS_TEST_XKCP)
+
+out/test/generate-test-vectors-openssl: $(OBJS_GEN_TEST_VECS) $(OBJS_LIB_OPENSSL)
+	$(CC) -o $@ $+ $(LDFLAGS_TEST_OPENSSL)
 
 out/test/randombytes_shake256_deterministic.o: src/test/randombytes_shake256_deterministic.c $(HEADERS_GEN_TEST_VECS)
 	$(CC) -c -o $@ $(CFLAGS_TEST) $<
@@ -197,6 +215,9 @@ out/pkpsig/symmetric_core.o: src/pkpsig/symmetric_core.c src/pkpsig/symmetric_in
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
 out/pkpsig/symmetric_shake_xkcp.o: src/pkpsig/symmetric_shake_xkcp.c src/pkpsig/symmetric_internal.h src/pkpsig/symmetric_endian.h $(HEADERS_PKPSIG)
+	cc -c -o $@ $< $(CFLAGS_PKPSIG)
+
+out/pkpsig/symmetric_shake_openssl.o: src/pkpsig/symmetric_shake_openssl.c src/pkpsig/symmetric_internal.h src/pkpsig/symmetric_endian.h $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
 out/pkpsig/symmetric_xoesch256.o: src/pkpsig/symmetric_xoesch256.c src/pkpsig/symmetric_internal.h src/pkpsig/symmetric_endian.h $(HEADERS_PKPSIG)
