@@ -31,7 +31,6 @@ CFLAGS_TEST = -Iinclude/ \
 LIBS = -lXKCP \
 
 LIBS_TEST = ${LIBS} \
-	-lcrypto \
 
 
 LDFLAGS = -g
