@@ -49,44 +49,44 @@ OBJS_DJBSORT = \
 
 
 HEADERS_PQCR = \
-        include/pqcr/modulo.h \
-        include/pqcr/vectenc.h \
+	include/pqcr/modulo.h \
+	include/pqcr/vectenc.h \
 
 OBJS_PQCR = \
-        out/pqcr/modulo.o \
-        out/pqcr/vectenc.o \
+	out/pqcr/modulo.o \
+	out/pqcr/vectenc.o \
 
 
 HEADERS_PKPSIG = \
-        include/pkpsig/api_unified.h \
-        include/pkpsig/keys.h \
-        include/pkpsig/paramset.h \
-        include/pkpsig/permute.h \
-        include/pkpsig/randombytes.h \
-        include/pkpsig/signatures.h \
-        include/pkpsig/sigstate.h \
-        include/pkpsig/sort.h \
-        include/pkpsig/symmetric.h \
-        include/pkpsig/zkpshamir.h \
+	include/pkpsig/api_unified.h \
+	include/pkpsig/keys.h \
+	include/pkpsig/paramset.h \
+	include/pkpsig/permute.h \
+	include/pkpsig/randombytes.h \
+	include/pkpsig/signatures.h \
+	include/pkpsig/sigstate.h \
+	include/pkpsig/sort.h \
+	include/pkpsig/symmetric.h \
+	include/pkpsig/zkpshamir.h \
 
 OBJS_PKPSIG = \
 	out/pkpsig/api_unified.o \
-        out/pkpsig/keys_core.o \
-        out/pkpsig/keys_generate.o \
-        out/pkpsig/keys_math.o \
-        out/pkpsig/keys_unpack.o \
-        out/pkpsig/paramset.o \
-        out/pkpsig/permute.o \
-        out/pkpsig/randombytes.o \
-        out/pkpsig/signatures.o \
-        out/pkpsig/sigstate.o \
-        out/pkpsig/sort_blob.o \
-        out/pkpsig/sort_int32.o \
-        out/pkpsig/symmetric_core.o \
-        out/pkpsig/symmetric_shake256.o \
-        out/pkpsig/symmetric_xoesch256.o \
-        out/pkpsig/symmetric_xoesch384.o \
-        out/pkpsig/zkpshamir.o \
+	out/pkpsig/keys_core.o \
+	out/pkpsig/keys_generate.o \
+	out/pkpsig/keys_math.o \
+	out/pkpsig/keys_unpack.o \
+	out/pkpsig/paramset.o \
+	out/pkpsig/permute.o \
+	out/pkpsig/randombytes.o \
+	out/pkpsig/signatures.o \
+	out/pkpsig/sigstate.o \
+	out/pkpsig/sort_blob.o \
+	out/pkpsig/sort_int32.o \
+	out/pkpsig/symmetric_core.o \
+	out/pkpsig/symmetric_shake256.o \
+	out/pkpsig/symmetric_xoesch256.o \
+	out/pkpsig/symmetric_xoesch384.o \
+	out/pkpsig/zkpshamir.o \
 
 HEADERS_XOESCH = \
 	include/xoesch/xoesch.h \
