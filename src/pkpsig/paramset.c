@@ -56,15 +56,6 @@ static const struct pkpsig_seclevel seclevels[] =
     { NULL, 0, 0 }
   };
 
-enum pkp_param_set_enum {
-  PKP_PARAM_SET_q797n55m25,
-  PKP_PARAM_SET_q977n61m28,
-  PKP_PARAM_SET_q1409n87m42,
-  PKP_PARAM_SET_q1789n111m55,
-  N_PKP_PARAM_SETS
-};
-static struct pkpsig_pkpparams pkpparamsets[N_PKP_PARAM_SETS];
-
 #define KEYFMT_B128 0
 #define KEYFMT_B192 1
 #define KEYFMT_B256 2
