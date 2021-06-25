@@ -298,7 +298,7 @@ struct pkpsig_paramset *pkpsig_paramset_alloc_by_name(const char *name) {
   const char *symalg;
   const struct paramset_data *psd;
   int has_flag, flag;
-  size_t i, len;
+  size_t len;
 
   len = strlen(name);
   if (len > sizeof(name_buf) - 1) return NULL;
