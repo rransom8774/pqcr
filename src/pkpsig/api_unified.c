@@ -95,6 +95,59 @@ int pkpsig_simple_keypair(const char *paramset_name, uint8_t *publickey_out, uin
   return rv;
 };
 
+int pkpsig_simple_secretkey_to_publickey(const char *paramset_name, uint8_t *publickey_out, const uint8_t *secretkey) {
+  struct pkpsig_paramset *ps = pkpsig_paramset_alloc_by_name(paramset_name);
+  struct pkpsig_scratch_store *st = NULL;
+  struct pkpsig_keysecret *key = NULL;
+  size_t pkblob_bytes;
+  size_t skblob_bytes;
+  int rv = 0;
+
+  if (ps == NULL) {
+    rv = -2;
+    goto end;
+  };
+
+  pkblob_bytes = pkpsig_paramset_get_pkblob_bytes(ps);
+  skblob_bytes = pkpsig_paramset_get_skblob_bytes(ps);
+
+  st = pkpsig_scratch_store_new(ps->symmetric_algo);
+  if (st == NULL) {
+    rv = -3;
+    goto end;
+  };
+
+  pkpsig_scratch_store_set_paramset(st, ps);
+  if (pkpsig_scratch_store_alloc_bufs(st) != 0) {
+    rv = -3;
+    goto end;
+  };
+
+  key = pkpsig_key_secret_new(ps);
+
+  if (key == NULL) {
+    rv = -3;
+    goto end;
+  };
+
+  memcpy(key->skblob, secretkey, skblob_bytes);
+  if (pkpsig_key_unpack_skblob(st, key) < 0) {
+    rv = -1;
+    goto end;
+  };
+
+  memcpy(publickey_out, key->pub.pkblob, pkblob_bytes);
+
+  pkpsig_key_secret_zero(key);
+  pkpsig_scratch_store_zero_bufs(st);
+
+ end:
+  pkpsig_key_secret_free(key);
+  pkpsig_scratch_store_free(st);
+  pkpsig_paramset_free(ps);
+  return rv;
+};
+
 int pkpsig_simple_detached_sign(const char *paramset_name, uint8_t *sigout, const uint8_t *msg, size_t msglen, const uint8_t *secretkey) {
   struct pkpsig_paramset *ps = pkpsig_paramset_alloc_by_name(paramset_name);
   struct pkpsig_scratch_store *st = NULL;

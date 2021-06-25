@@ -20,6 +20,7 @@ ssize_t pkpsig_simple_get_secretkey_bytes(const char *paramset_name);
 ssize_t pkpsig_simple_get_signature_bytes(const char *paramset_name);
 
 int pkpsig_simple_keypair(const char *paramset_name, uint8_t *publickey_out, uint8_t *secretkey_out);
+int pkpsig_simple_secretkey_to_publickey(const char *paramset_name, uint8_t *publickey_out, const uint8_t *secretkey);
 
 int pkpsig_simple_detached_sign(const char *paramset_name, uint8_t *sigout, const uint8_t *msg, size_t msglen, const uint8_t *secretkey);
 
