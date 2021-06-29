@@ -46,6 +46,24 @@ ssize_t pkpsig_simple_get_signature_bytes(const char *paramset_name) {
   return rv;
 };
 
+char *pkpsig_simple_ui_seclevel_bits_to_paramset_name(int bits) {
+  char *rv = NULL;
+  struct pkpsig_paramset *ps = pkpsig_paramset_alloc_by_ui_seclevel_bits(bits);
+  if (ps == NULL) return NULL;
+  rv = ps->name; ps->name = NULL;
+  pkpsig_paramset_free(ps);
+  return rv;
+};
+
+int pkpsig_simple_paramset_name_to_ui_seclevel_bits(const char *paramset_name) {
+  ssize_t rv;
+  struct pkpsig_paramset *ps = pkpsig_paramset_alloc_by_name(paramset_name);
+  if (ps == NULL) return -2;
+  rv = pkpsig_paramset_get_ui_seclevel_bits(ps);
+  pkpsig_paramset_free(ps);
+  return rv;
+};
+
 const char *pkpsig_simple_get_hash_algo_name(const char *paramset_name) {
   const char *rv;
   struct pkpsig_paramset *ps = pkpsig_paramset_alloc_by_name(paramset_name);
