@@ -114,7 +114,8 @@ static void shake256_expand(struct pkpsig_scratch_store *st, uint8_t *output, si
 };
 
 static const struct pkpsig_symmetric_algo symalg_keccak_openssl =
-  {"shake256", 0,
+  {"shake256", "SHAKE256", "SHAKE256",
+   0,
    64, 64,
    state_alloc,
    state_set_prefix,

@@ -31,29 +31,63 @@ static size_t compute_treehash_degree(struct pkpsig_paramset *ps) {
 };
 
 static const struct pkpsig_seclevel seclevels[] =
-  { { "b80",     10, 20},
+  { { "b80",     "80-bit",        "80-bit",  80,  10, 20 },
 #define SECLEVEL_b80 0
-    { "b96",     12, 24},
+    { "b96",     "96-bit",        "96-bit",  96,  12, 24 },
 #define SECLEVEL_b96 1
-    { "b112git", 14, 20},
+    { "b112git", "112-bit (Git-level collision strength)",
+      "112-bit (for Git)",                   111, 14, 20 },
 #define SECLEVEL_b112git 2
-    { "b112",    14, 28},
+    { "b112",    "112-bit",       "112-bit", 112, 14, 28 },
 #define SECLEVEL_b112 3
-    { "c1",  16, 32 },
+    { "c1",      "Category 1",    "Cat. 1",  128, 16, 32 },
 #define SECLEVEL_c1 4
-    { "c1a", 20, 32 },
+    { "c1a",     "Category 1A",   "Cat. 1A", 160, 20, 32 },
 #define SECLEVEL_c1a 5
-    { "c2",  24, 32 },
+    { "c2",      "Category 2",    "Cat. 2",  191, 24, 32 },
 #define SECLEVEL_c2 6
-    { "c3",  24, 48 },
+    { "c3",      "Category 3",    "Cat. 3",  192, 24, 48 },
 #define SECLEVEL_c3 7
-    { "c4",  32, 48 },
+    { "c4",      "Category 4",    "Cat. 4",  255, 32, 48 },
 #define SECLEVEL_c4 8
-    { "c5",  32, 64 },
+    { "c5",      "Category 5",    "Cat. 5",  256, 32, 64 },
 #define SECLEVEL_c5 9
-    { "c6",  48, 64 }, /* may be more conservative than other definitions */
+    /* This may be more conservative than other "Category 6" definitions. */
+    { "c6",      "Category 6",    "Cat. 6",  384, 48, 64 },
 #define SECLEVEL_c6 10
-    { NULL, 0, 0 }
+    { NULL, NULL, NULL, 0, 0, 0 }
+  };
+
+/* Fingerprint formats:
+ *
+ * >>> 256/math.log2(34)
+ * 50.31977785160259
+ * >>> sum((7,5,7,4,6) + (3,6,4,6,3))
+ * 51
+ *
+ * >>> 384/math.log2(34)
+ * 75.47966677740389
+ * >>> sum((7,5,7,4,6) + (3,6,4,6,3) + (6,3,5,4,7))
+ * 76
+ *
+ * >>> 512/math.log2(34)
+ * 100.63955570320518
+ * >>> sum((6,3,5,4,7) + (3,6,4,6,3) + (7,5,7,4,6) + (4,7,3,7,4))
+ * 101
+ *
+ */
+
+static const uint8_t fprint_line_fmts[][6] =
+  { { 7,4,7,4,6, 0 },
+    { 4,6,4,6,3, 0 },
+    { 6,3,5,4,7, 0 },
+    { 4,7,3,7,4 ,0 },
+  };
+
+static const pkpsig_fprint_line_format fprint_fmts[3][5] =
+  { { fprint_line_fmts[0], fprint_line_fmts[1], NULL, NULL, NULL },
+    { fprint_line_fmts[0], fprint_line_fmts[1], fprint_line_fmts[2], NULL, NULL },
+    { fprint_line_fmts[2], fprint_line_fmts[1], fprint_line_fmts[0], fprint_line_fmts[3], NULL },
   };
 
 #define KEYFMT_B128 0
@@ -61,9 +95,9 @@ static const struct pkpsig_seclevel seclevels[] =
 #define KEYFMT_B256 2
 #define N_KEYFMTS   3
 static const struct pkpsig_keyfmt keyfmts[N_KEYFMTS] =
-  { { 17, 32, 32,  8,  64 },
-    { 25, 48, 48, 12,  96 },
-    { 33, 64, 64, 16, 128 },
+  { { 17, 32, 32,  8,  64, fprint_fmts[0] },
+    { 25, 48, 48, 12,  96, fprint_fmts[1] },
+    { 33, 64, 64, 16, 128, fprint_fmts[2] },
   };
 
 struct paramset_data {
@@ -336,6 +370,61 @@ struct pkpsig_paramset *pkpsig_paramset_alloc_by_name(const char *name) {
   return alloc_paramset_from_data(kp, symalg, psd, flag);
 };
 
+struct paramset_from_ui_bits_map_entry {
+  uint16_t bits;
+  uint8_t i_key_seclevel, i_sig_seclevel;
+};
+static const struct paramset_from_ui_bits_map_entry paramset_from_ui_bits_map[] = {
+  {  80, SECLEVEL_c1a, SECLEVEL_b80     },
+  {  96, SECLEVEL_c1a, SECLEVEL_b96     },
+  { 111, SECLEVEL_c1a, SECLEVEL_b112git },
+  { 112, SECLEVEL_c1a, SECLEVEL_b112    },
+  { 128, SECLEVEL_c2,  SECLEVEL_c1      },
+  { 160, SECLEVEL_c2,  SECLEVEL_c1a     },
+  { 191, SECLEVEL_c4,  SECLEVEL_c2      },
+  { 192, SECLEVEL_c4,  SECLEVEL_c3      },
+  { 255, SECLEVEL_c5,  SECLEVEL_c4      },
+  { 256, SECLEVEL_c5,  SECLEVEL_c5      },
+  { 384, SECLEVEL_c6,  SECLEVEL_c6      },
+};
+#define MAX_UI_SECLEVEL_BITS 384
+
+struct pkpsig_paramset *pkpsig_paramset_alloc_by_ui_seclevel_bits(int bits) {
+  int i, j;
+  struct paramset_from_ui_bits_map_entry entry = {0, 0, 0};
+  const struct keyparams_data *kp = NULL;
+  const char *symalg = "shake256";
+  const struct paramset_data *psd = NULL;
+
+  if ((bits < 0) || (bits > MAX_UI_SECLEVEL_BITS)) {
+    return NULL;
+  };
+
+  for (i = 0; paramset_from_ui_bits_map[i].bits >= bits; ++i) {
+    /* do nothing */
+  };
+
+  entry = paramset_from_ui_bits_map[i];
+
+  for (i = 0; keyparamsets[i].name != NULL; ++i) {
+    if (keyparamsets[i].i_key_seclevel == entry.i_key_seclevel) {
+      kp = &(keyparamsets[i]);
+      break;
+    };
+  };
+  if (kp == NULL) return NULL;
+
+  for (i = 0; kp->paramsets[i].n_runs_long != 0; ++i) {
+    if (kp->paramsets[i].i_sig_seclevel == entry.i_sig_seclevel) {
+      psd = &(kp->paramsets[i]);
+      break;
+    };
+  };
+  if (psd == NULL) return NULL;
+
+  return alloc_paramset_from_data(kp, symalg, psd, 0);
+};
+
 void pkpsig_paramset_free(struct pkpsig_paramset *ps) {
   if (ps == NULL) return;
   if (ps->name != NULL) free(ps->name);
@@ -404,6 +493,103 @@ int pkpsig_paramset_enumerate_names(pkpsig_paramset_enumerate_names_cb cb, void 
   };
 
   return 0;
+};
+
+int pkpsig_paramset_get_ui_seclevel_bits(const struct pkpsig_paramset *ps) {
+  return ps->seclevel_signature->ui_bits;
+};
+
+static size_t pieces_to_buf(char *buf, size_t size, const char * const *pieces) {
+  char *pos = buf;
+  size_t len = 0;
+  size_t i;
+
+  if (pos == NULL) {
+    size = 0;
+  };
+
+  for (i = 0; pieces[i] != NULL; ++i) {
+    size_t piece_len = strlen(pieces[i]);
+
+    len += piece_len;
+
+    if (piece_len <= size) {
+      memcpy(pos, pieces[i], piece_len);
+      pos += piece_len;
+      size -= piece_len;
+    } else {
+      pos = NULL;
+      size = 0;
+    };
+  };
+
+  if (size >= 1) {
+    /* NUL-terminate output string */
+    *pos = 0;
+  };
+
+  return len;
+};
+
+/* If size is less than the string length + 1, will stop writing at
+   some point before the end of buf (not necessarily writing up to the
+   end itself). */
+size_t pkpsig_paramset_get_short_desc(const struct pkpsig_paramset *ps, char *buf, size_t size) {
+  static const char *const comma = ", ";
+  const char *pieces[] =
+    { "key ", ps->seclevel_keypair->short_ui_name, comma,
+      "sig ", ps->seclevel_signature->short_ui_name, comma,
+      "hash ", pkpsig_symmetric_algo_ui_name_short(ps->symmetric_algo),
+      NULL
+    };
+
+  return pieces_to_buf(buf, size, pieces);
+};
+
+/* If size is less than the string length + 1, will stop writing at
+   some point before the end of buf (not necessarily writing up to the
+   end itself). */
+size_t pkpsig_paramset_get_description(const struct pkpsig_paramset *ps, char *buf, size_t size) {
+  static const char *const sec = " security ";
+  static const char *const comma = ", ";
+  const char *pieces[] =
+    { "key", sec, ps->seclevel_keypair->long_ui_name, comma,
+      "signature", sec, ps->seclevel_signature->long_ui_name, comma,
+      "with ", pkpsig_symmetric_algo_ui_name_long(ps->symmetric_algo),
+      " hashing",
+      NULL
+    };
+
+  return pieces_to_buf(buf, size, pieces);
+};
+
+size_t pkpsig_paramset_get_fingerprint_lines(const struct pkpsig_paramset *ps) {
+  const pkpsig_fprint_line_format *fprint_fmt = ps->keyfmt->fingerprint_format;
+  size_t i;
+
+  for (i = 0; fprint_fmt[i] != NULL; ++i) {
+    /* do nothing */
+  };
+
+  return i;
+};
+
+size_t pkpsig_paramset_get_fingerprint_chars(const struct pkpsig_paramset *ps) {
+  const pkpsig_fprint_line_format *fprint_fmt = ps->keyfmt->fingerprint_format;
+  size_t rv = 0;
+  size_t i, j;
+
+  for (i = 0; fprint_fmt[i] != NULL; ++i) {
+    const uint8_t *line = fprint_fmt[i];
+    for (j = 0; line[j] != 0; ++j) {
+      rv += line[j];
+      ++rv; /* either ' ' or '\n' */
+    };
+  };
+
+  --rv; /* no trailing \n */
+
+  return rv;
 };
 
 size_t pkpsig_paramset_get_pkblob_bytes(const struct pkpsig_paramset *ps) {

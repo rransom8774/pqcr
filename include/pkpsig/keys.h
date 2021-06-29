@@ -46,6 +46,10 @@ void pkpsig_key_secret_free(struct pkpsig_keysecret *key);
 
 void pkpsig_key_generate(struct pkpsig_scratch_store *st, struct pkpsig_keysecret *key);
 
+void pkpsig_format_fingerprint(struct pkpsig_scratch_store *st, char *out, const uint8_t *hash);
+
+void pkpsig_key_fingerprint(struct pkpsig_scratch_store *st, struct pkpsig_keypublic *pub, char *out);
+
 int pkpsig_key_unpack_skblob(struct pkpsig_scratch_store *st, struct pkpsig_keysecret *key);
 int pkpsig_key_unpack_pkblob(struct pkpsig_scratch_store *st, struct pkpsig_keypublic *pub);
 

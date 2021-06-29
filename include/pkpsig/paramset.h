@@ -17,6 +17,9 @@
 
 struct pkpsig_seclevel {
   const char *name;
+  const char *long_ui_name;
+  const char *short_ui_name;
+  uint16_t ui_bits;
   uint8_t preimage_bytes;
   uint8_t crhash_bytes;
 };
@@ -34,6 +37,8 @@ struct pkpsig_pkpparams {
   struct vectcoder *vc_sig_perm_squished;
 };
 
+typedef const uint8_t *pkpsig_fprint_line_format;
+
 struct pkpsig_keyfmt {
   size_t bytes_pubparamseed;
   size_t bytes_seckeyseed;
@@ -41,6 +46,8 @@ struct pkpsig_keyfmt {
   size_t bytes_seckeychecksum;
 
   size_t bytes_blindingseedgenseed;
+
+  const pkpsig_fprint_line_format *fingerprint_format;
 };
 
 struct pkpsig_paramset {
@@ -64,11 +71,18 @@ struct pkpsig_paramset {
 };
 
 struct pkpsig_paramset *pkpsig_paramset_alloc_by_name(const char *name);
+struct pkpsig_paramset *pkpsig_paramset_alloc_by_ui_seclevel_bits(int bits);
 void pkpsig_paramset_free(struct pkpsig_paramset *ps);
 
 typedef int (*pkpsig_paramset_enumerate_names_cb)(void *ud, const char *name);
 
 int pkpsig_paramset_enumerate_names(pkpsig_paramset_enumerate_names_cb cb, void *ud);
+
+int pkpsig_paramset_get_ui_seclevel_bits(const struct pkpsig_paramset *ps);
+size_t pkpsig_paramset_get_short_desc(const struct pkpsig_paramset *ps, char *buf, size_t size);
+size_t pkpsig_paramset_get_description(const struct pkpsig_paramset *ps, char *buf, size_t size);
+size_t pkpsig_paramset_get_fingerprint_lines(const struct pkpsig_paramset *ps);
+size_t pkpsig_paramset_get_fingerprint_chars(const struct pkpsig_paramset *ps);
 
 size_t pkpsig_paramset_get_pkblob_bytes(const struct pkpsig_paramset *ps);
 size_t pkpsig_paramset_get_skblob_bytes(const struct pkpsig_paramset *ps);

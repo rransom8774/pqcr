@@ -45,6 +45,60 @@ ssize_t pkpsig_simple_get_signature_bytes(const char *paramset_name) {
   return rv;
 };
 
+const char *pkpsig_simple_get_hash_algo_name(const char *paramset_name) {
+  const char *rv;
+  struct pkpsig_paramset *ps = pkpsig_paramset_alloc_by_name(paramset_name);
+  if (ps == NULL) return NULL;
+  rv = pkpsig_symmetric_algo_name(ps->symmetric_algo);
+  pkpsig_paramset_free(ps);
+  return rv;
+};
+
+const char *pkpsig_simple_get_hash_algo_ui_name_short(const char *paramset_name) {
+  const char *rv;
+  struct pkpsig_paramset *ps = pkpsig_paramset_alloc_by_name(paramset_name);
+  if (ps == NULL) return NULL;
+  rv = pkpsig_symmetric_algo_ui_name_short(ps->symmetric_algo);
+  pkpsig_paramset_free(ps);
+  return rv;
+};
+
+const char *pkpsig_simple_get_hash_algo_ui_name_long(const char *paramset_name) {
+  const char *rv;
+  struct pkpsig_paramset *ps = pkpsig_paramset_alloc_by_name(paramset_name);
+  if (ps == NULL) return NULL;
+  rv = pkpsig_symmetric_algo_ui_name_long(ps->symmetric_algo);
+  pkpsig_paramset_free(ps);
+  return rv;
+};
+
+ssize_t pkpsig_simple_get_paramset_description(const char *paramset_name, char *buf, size_t size) {
+  ssize_t rv;
+  struct pkpsig_paramset *ps = pkpsig_paramset_alloc_by_name(paramset_name);
+  if (ps == NULL) return -2;
+  rv = pkpsig_paramset_get_description(ps, buf, size);
+  pkpsig_paramset_free(ps);
+  return rv;
+};
+
+ssize_t pkpsig_simple_get_fingerprint_lines(const char *paramset_name) {
+  ssize_t rv;
+  struct pkpsig_paramset *ps = pkpsig_paramset_alloc_by_name(paramset_name);
+  if (ps == NULL) return -2;
+  rv = pkpsig_paramset_get_fingerprint_lines(ps);
+  pkpsig_paramset_free(ps);
+  return rv;
+};
+
+ssize_t pkpsig_simple_get_fingerprint_chars(const char *paramset_name) {
+  ssize_t rv;
+  struct pkpsig_paramset *ps = pkpsig_paramset_alloc_by_name(paramset_name);
+  if (ps == NULL) return -2;
+  rv = pkpsig_paramset_get_fingerprint_chars(ps);
+  pkpsig_paramset_free(ps);
+  return rv;
+};
+
 int pkpsig_simple_keypair(const char *paramset_name, uint8_t *publickey_out, uint8_t *secretkey_out) {
   struct pkpsig_paramset *ps = pkpsig_paramset_alloc_by_name(paramset_name);
   struct pkpsig_scratch_store *st = NULL;
@@ -143,6 +197,50 @@ int pkpsig_simple_secretkey_to_publickey(const char *paramset_name, uint8_t *pub
 
  end:
   pkpsig_key_secret_free(key);
+  pkpsig_scratch_store_free(st);
+  pkpsig_paramset_free(ps);
+  return rv;
+};
+
+int pkpsig_simple_fingerprint(const char *paramset_name, char *fingerprint_out, const uint8_t *publickey_in) {
+  struct pkpsig_paramset *ps = pkpsig_paramset_alloc_by_name(paramset_name);
+  struct pkpsig_scratch_store *st = NULL;
+  struct pkpsig_keypublic *pub = NULL;
+  size_t pkblob_bytes;
+  int rv = 0;
+
+  if (ps == NULL) {
+    rv = -2;
+    goto end;
+  };
+
+  pkblob_bytes = pkpsig_paramset_get_pkblob_bytes(ps);
+
+  st = pkpsig_scratch_store_new(ps->symmetric_algo);
+  if (st == NULL) {
+    rv = -3;
+    goto end;
+  };
+
+  pkpsig_scratch_store_set_paramset(st, ps);
+  if (pkpsig_scratch_store_alloc_bufs(st) != 0) {
+    rv = -3;
+    goto end;
+  };
+
+  pub = pkpsig_key_public_new(ps);
+
+  if (pub == NULL) {
+    rv = -3;
+    goto end;
+  };
+
+  memcpy(pub->pkblob, publickey_in, pkblob_bytes);
+
+  pkpsig_key_fingerprint(st, pub, fingerprint_out);
+
+ end:
+  pkpsig_key_public_free(pub);
   pkpsig_scratch_store_free(st);
   pkpsig_paramset_free(ps);
   return rv;

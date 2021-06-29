@@ -53,6 +53,16 @@ const char *pkpsig_symmetric_algo_name(const struct pkpsig_symmetric_algo *algo)
   return algo->name;
 };
 
+const char *pkpsig_symmetric_algo_ui_name_short(const struct pkpsig_symmetric_algo *algo) {
+  if (algo == NULL) return NULL;
+  return algo->short_ui_name;
+};
+
+const char *pkpsig_symmetric_algo_ui_name_long(const struct pkpsig_symmetric_algo *algo) {
+  if (algo == NULL) return NULL;
+  return algo->long_ui_name;
+};
+
 size_t pkpsig_symmetric_algo_state_bytes(const struct pkpsig_symmetric_algo *algo) {
   return algo->state_bytes;
 };
@@ -92,34 +102,40 @@ void pkpsig_scratch_store_set_paramset(struct pkpsig_scratch_store *st, const st
   /* Uses of outputbuf:
      - expand_fqvec: veclen * 4 (veclen is n or m)
      - expand_perm: n * 4
-     - pkpsig_signature_verify: sig_crhash_bytes */
+     - pkpsig_signature_verify: sig_crhash_bytes
+     - pkpsig_key_fingerprint: bytes_seckeyseed */
   len = st->output_bytes;
   assert(m < n);
   /* clmqoj(m * 4); */
   clmqoj(n * 4);
   clmqoj(sig_crhash_bytes);
+  clmqoj(ps->keyfmt->bytes_seckeyseed);
   uxjhr(st->output_bytes);
 
   /* Compute maximum size of tmpbuf and store it in tmpbuf_bytes */
 
   /* Uses of tmpbuf:
-     - shake256_hash_ui16vec: n*2 or m*2 */
+     - shake256_hash_ui16vec: n*2 or m*2
+     - pkpsig_format_fingerprint: < pkpsig_paramset_get_fingerprint_chars */
   len = st->tmpbuf_bytes;
   assert(m < n);
   /* clmqoj(m * 2); */
   clmqoj(n * 2);
+  clmqoj(pkpsig_paramset_get_fingerprint_chars(ps));
   uxjhr(st->tmpbuf_bytes);
 
   /* Compute maximum size of vecbuf (in uint32_ts) and store it in vec_elts */
 
   /* vecbuf is used by many functions for vectors of length n, m, or
      sortpad(n).  zkpshamir.c uses it for two vectors at once, total
-     length 2*n. */
+     length 2*n.  keys_fingerprint.c uses it for two vectors of length
+     bytes_seckeyseed. */
   len = st->vec_elts;
   assert(m < n);
   clmqoj(pkpsig_sort_anyint32_get_pad_length(n));
   assert(len >= n);
   clmqoj(2*n);
+  clmqoj(2*(ps->keyfmt->bytes_seckeyseed));
   uxjhr(st->vec_elts);
 
   /* Compute maximum size of treehash_buf and store it in treehash_buf_bytes */
@@ -923,5 +939,10 @@ void pkpsig_symmetric_expand_challenge2s(struct pkpsig_sigstate *sst, int verify
       runs[i].c_and_b |= x << 15;
     };
   };
+};
+
+void pkpsig_symmetric_gen_fingerprint_hash(struct pkpsig_scratch_store *st, uint8_t *hash_out, const uint8_t *pkblob, size_t pkblob_len) {
+  st->algo->hash_init(st, HASHCTX_FINGERPRINT, pkblob, pkblob_len);
+  st->algo->expand(st, hash_out, st->ps->keyfmt->bytes_seckeyseed);
 };
 

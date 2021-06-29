@@ -78,6 +78,7 @@ HEADERS_PKPSIG = \
 OBJS_PKPSIG = \
 	out/pkpsig/api_unified.o \
 	out/pkpsig/keys_core.o \
+	out/pkpsig/keys_fingerprint.o \
 	out/pkpsig/keys_generate.o \
 	out/pkpsig/keys_math.o \
 	out/pkpsig/keys_unpack.o \
@@ -179,6 +180,9 @@ out/pkpsig/api_unified.o: src/pkpsig/api_unified.c $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
 out/pkpsig/keys_core.o: src/pkpsig/keys_core.c $(HEADERS_PKPSIG)
+	cc -c -o $@ $< $(CFLAGS_PKPSIG)
+
+out/pkpsig/keys_fingerprint.o: src/pkpsig/keys_fingerprint.c $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
 out/pkpsig/keys_generate.o: src/pkpsig/keys_generate.c $(HEADERS_PKPSIG)

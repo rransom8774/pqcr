@@ -53,7 +53,9 @@ typedef int (*pkpsig_symmetric_algo_enumerate_names_cb)(void *ud, const char *na
 const struct pkpsig_symmetric_algo *pkpsig_symmetric_algo_get(const char *name);
 int pkpsig_symmetric_algo_enumerate_names(pkpsig_symmetric_algo_enumerate_names_cb cb, void *ud);
 const char *pkpsig_symmetric_algo_name(const struct pkpsig_symmetric_algo *algo);
-size_t pkpsig_symmetric_algo_state_bytes(const struct pkpsig_symmetric_algo *algo);
+const char *pkpsig_symmetric_algo_ui_name_short(const struct pkpsig_symmetric_algo *algo);
+const char *pkpsig_symmetric_algo_ui_name_long(const struct pkpsig_symmetric_algo *algo);
+ size_t pkpsig_symmetric_algo_state_bytes(const struct pkpsig_symmetric_algo *algo);
 int pkpsig_symmetric_algo_check_seclevel(const struct pkpsig_symmetric_algo *algo, int preimage_bytes, int crhash_bytes);
 
 struct pkpsig_scratch_store *pkpsig_scratch_store_new(const struct pkpsig_symmetric_algo *algo);
@@ -84,5 +86,7 @@ void pkpsig_symmetric_expand_challenge1s(struct pkpsig_sigstate *sst, int verify
 
 void pkpsig_symmetric_hash_commit2s(struct pkpsig_sigstate *sst, uint8_t *outbuf, int verifying);
 void pkpsig_symmetric_expand_challenge2s(struct pkpsig_sigstate *sst, int verifying);
+
+void pkpsig_symmetric_gen_fingerprint_hash(struct pkpsig_scratch_store *st, uint8_t *hash_out, const uint8_t *pkblob, size_t pkblob_len);
 
 #endif

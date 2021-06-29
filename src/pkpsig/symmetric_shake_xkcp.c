@@ -124,7 +124,8 @@ static void shake256_expand(struct pkpsig_scratch_store *st, uint8_t *output, si
 };
 
 static const struct pkpsig_symmetric_algo symalg_keccak =
-  {"shake256", sizeof(KeccakWidth1600_SpongeInstance),
+  {"shake256", "SHAKE256", "SHAKE256",
+   sizeof(KeccakWidth1600_SpongeInstance),
    64, 64,
    pkpsig_generic_algo_state_alloc,
    pkpsig_generic_algo_state_set_prefix,

@@ -15,6 +15,8 @@ struct pkpsig_chunk {
 
 struct pkpsig_symmetric_algo {
   const char *name;
+  const char *long_ui_name;
+  const char *short_ui_name;
   size_t state_bytes;
 
   uint8_t max_seclevel_preimage_bytes;
@@ -65,6 +67,7 @@ void pkpsig_scratch_store_zero_algo_state(struct pkpsig_scratch_store *st);
 #define HASHCTX_CHALLENGE1EXPAND 7
 #define HASHCTX_CHALLENGE2HASH 8
 #define HASHCTX_CHALLENGE2EXPAND 9
+#define HASHCTX_FINGERPRINT 10
 
 #define HASHCTX_INTERNAL_GENMSGHASHSALT 0x80
 #define HASHCTX_INTERNAL_GENBLINDINGSEEDGENSEED 0x81
