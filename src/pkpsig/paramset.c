@@ -400,7 +400,7 @@ struct pkpsig_paramset *pkpsig_paramset_alloc_by_ui_seclevel_bits(int bits) {
     return NULL;
   };
 
-  for (i = 0; paramset_from_ui_bits_map[i].bits >= bits; ++i) {
+  for (i = 0; paramset_from_ui_bits_map[i].bits < bits; ++i) {
     /* do nothing */
   };
 
