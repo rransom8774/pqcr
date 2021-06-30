@@ -79,6 +79,7 @@ typedef int (*pkpsig_paramset_enumerate_names_cb)(void *ud, const char *name);
 int pkpsig_paramset_enumerate_names(pkpsig_paramset_enumerate_names_cb cb, void *ud);
 
 int pkpsig_paramset_get_ui_seclevel_bits(const struct pkpsig_paramset *ps);
+int pkpsig_paramset_get_keygen_entropy_bits(const struct pkpsig_paramset *ps);
 size_t pkpsig_paramset_get_short_desc(const struct pkpsig_paramset *ps, char *buf, size_t size);
 size_t pkpsig_paramset_get_description(const struct pkpsig_paramset *ps, char *buf, size_t size);
 size_t pkpsig_paramset_get_fingerprint_lines(const struct pkpsig_paramset *ps);

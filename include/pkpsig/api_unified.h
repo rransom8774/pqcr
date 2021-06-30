@@ -21,6 +21,7 @@ ssize_t pkpsig_simple_get_signature_bytes(const char *paramset_name);
 
 char *pkpsig_simple_ui_seclevel_bits_to_paramset_name(int bits);
 int pkpsig_simple_paramset_name_to_ui_seclevel_bits(const char *paramset_name);
+int pkpsig_simple_paramset_name_to_keygen_entropy_bits(const char *paramset_name);
 
 const char *pkpsig_simple_get_hash_algo_name(const char *paramset_name);
 const char *pkpsig_simple_get_hash_algo_ui_name_short(const char *paramset_name);

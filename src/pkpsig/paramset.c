@@ -499,6 +499,10 @@ int pkpsig_paramset_get_ui_seclevel_bits(const struct pkpsig_paramset *ps) {
   return ps->seclevel_signature->ui_bits;
 };
 
+int pkpsig_paramset_get_keygen_entropy_bits(const struct pkpsig_paramset *ps) {
+  return ps->keyfmt->bytes_seckeyseed * 16;
+};
+
 static size_t pieces_to_buf(char *buf, size_t size, const char * const *pieces) {
   char *pos = buf;
   size_t len = 0;

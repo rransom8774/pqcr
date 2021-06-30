@@ -64,6 +64,15 @@ int pkpsig_simple_paramset_name_to_ui_seclevel_bits(const char *paramset_name) {
   return rv;
 };
 
+int pkpsig_simple_paramset_name_to_keygen_entropy_bits(const char *paramset_name) {
+  ssize_t rv;
+  struct pkpsig_paramset *ps = pkpsig_paramset_alloc_by_name(paramset_name);
+  if (ps == NULL) return -2;
+  rv = pkpsig_paramset_get_keygen_entropy_bits(ps);
+  pkpsig_paramset_free(ps);
+  return rv;
+};
+
 const char *pkpsig_simple_get_hash_algo_name(const char *paramset_name) {
   const char *rv;
   struct pkpsig_paramset *ps = pkpsig_paramset_alloc_by_name(paramset_name);
