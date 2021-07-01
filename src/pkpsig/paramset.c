@@ -358,7 +358,7 @@ static const struct paramset_from_ui_bits_map_entry paramset_from_ui_bits_map[] 
 #define MAX_UI_SECLEVEL_BITS 384
 
 struct pkpsig_paramset *pkpsig_paramset_alloc_by_ui_seclevel_bits(int bits) {
-  int i, j;
+  int i;
   struct paramset_from_ui_bits_map_entry entry = {0, 0, 0};
   const struct keyparams_data *kp = NULL;
   const char *symalg = "shake256";
