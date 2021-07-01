@@ -46,8 +46,6 @@ struct pkpsig_keyfmt {
   size_t bytes_seckeychecksum;
 
   size_t bytes_blindingseedgenseed;
-
-  const pkpsig_fprint_line_format *fingerprint_format;
 };
 
 struct pkpsig_paramset {
@@ -82,8 +80,6 @@ int pkpsig_paramset_get_ui_seclevel_bits(const struct pkpsig_paramset *ps);
 int pkpsig_paramset_get_keygen_entropy_bits(const struct pkpsig_paramset *ps);
 size_t pkpsig_paramset_get_short_desc(const struct pkpsig_paramset *ps, char *buf, size_t size);
 size_t pkpsig_paramset_get_description(const struct pkpsig_paramset *ps, char *buf, size_t size);
-size_t pkpsig_paramset_get_fingerprint_lines(const struct pkpsig_paramset *ps);
-size_t pkpsig_paramset_get_fingerprint_chars(const struct pkpsig_paramset *ps);
 
 size_t pkpsig_paramset_get_pkblob_bytes(const struct pkpsig_paramset *ps);
 size_t pkpsig_paramset_get_skblob_bytes(const struct pkpsig_paramset *ps);

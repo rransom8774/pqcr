@@ -58,46 +58,14 @@ static const struct pkpsig_seclevel seclevels[] =
     { NULL, NULL, NULL, 0, 0, 0 }
   };
 
-/* Fingerprint formats:
- *
- * >>> 256/math.log2(34)
- * 50.31977785160259
- * >>> sum((7,5,7,4,6) + (3,6,4,6,3))
- * 51
- *
- * >>> 384/math.log2(34)
- * 75.47966677740389
- * >>> sum((7,5,7,4,6) + (3,6,4,6,3) + (6,3,5,4,7))
- * 76
- *
- * >>> 512/math.log2(34)
- * 100.63955570320518
- * >>> sum((6,3,5,4,7) + (3,6,4,6,3) + (7,5,7,4,6) + (4,7,3,7,4))
- * 101
- *
- */
-
-static const uint8_t fprint_line_fmts[][6] =
-  { { 7,4,7,4,6, 0 },
-    { 4,6,4,6,3, 0 },
-    { 6,3,5,4,7, 0 },
-    { 4,7,3,7,4 ,0 },
-  };
-
-static const pkpsig_fprint_line_format fprint_fmts[3][5] =
-  { { fprint_line_fmts[0], fprint_line_fmts[1], NULL, NULL, NULL },
-    { fprint_line_fmts[0], fprint_line_fmts[1], fprint_line_fmts[2], NULL, NULL },
-    { fprint_line_fmts[2], fprint_line_fmts[1], fprint_line_fmts[0], fprint_line_fmts[3], NULL },
-  };
-
 #define KEYFMT_B128 0
 #define KEYFMT_B192 1
 #define KEYFMT_B256 2
 #define N_KEYFMTS   3
 static const struct pkpsig_keyfmt keyfmts[N_KEYFMTS] =
-  { { 17, 32, 32,  8,  64, fprint_fmts[0] },
-    { 25, 48, 48, 12,  96, fprint_fmts[1] },
-    { 33, 64, 64, 16, 128, fprint_fmts[2] },
+  { { 17, 32, 32,  8,  64 },
+    { 25, 48, 48, 12,  96 },
+    { 33, 64, 64, 16, 128 },
   };
 
 struct paramset_data {
@@ -565,35 +533,6 @@ size_t pkpsig_paramset_get_description(const struct pkpsig_paramset *ps, char *b
     };
 
   return pieces_to_buf(buf, size, pieces);
-};
-
-size_t pkpsig_paramset_get_fingerprint_lines(const struct pkpsig_paramset *ps) {
-  const pkpsig_fprint_line_format *fprint_fmt = ps->keyfmt->fingerprint_format;
-  size_t i;
-
-  for (i = 0; fprint_fmt[i] != NULL; ++i) {
-    /* do nothing */
-  };
-
-  return i;
-};
-
-size_t pkpsig_paramset_get_fingerprint_chars(const struct pkpsig_paramset *ps) {
-  const pkpsig_fprint_line_format *fprint_fmt = ps->keyfmt->fingerprint_format;
-  size_t rv = 0;
-  size_t i, j;
-
-  for (i = 0; fprint_fmt[i] != NULL; ++i) {
-    const uint8_t *line = fprint_fmt[i];
-    for (j = 0; line[j] != 0; ++j) {
-      rv += line[j];
-      ++rv; /* either ' ' or '\n' */
-    };
-  };
-
-  --rv; /* no trailing \n */
-
-  return rv;
 };
 
 size_t pkpsig_paramset_get_pkblob_bytes(const struct pkpsig_paramset *ps) {

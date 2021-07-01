@@ -27,14 +27,9 @@ const char *pkpsig_simple_get_hash_algo_name(const char *paramset_name);
 const char *pkpsig_simple_get_hash_algo_ui_name_short(const char *paramset_name);
 const char *pkpsig_simple_get_hash_algo_ui_name_long(const char *paramset_name);
 ssize_t pkpsig_simple_get_paramset_description(const char *paramset_name, char *buf, size_t size);
-ssize_t pkpsig_simple_get_fingerprint_lines(const char *paramset_name);
-ssize_t pkpsig_simple_get_fingerprint_chars(const char *paramset_name);
 
 int pkpsig_simple_keypair(const char *paramset_name, uint8_t *publickey_out, uint8_t *secretkey_out);
 int pkpsig_simple_secretkey_to_publickey(const char *paramset_name, uint8_t *publickey_out, const uint8_t *secretkey);
-
-char *pkpsig_simple_fingerprint_full(const char *paramset_name, const uint8_t *publickey_in);
-char *pkpsig_simple_fingerprint_oneline(const char *paramset_name, const uint8_t *publickey_in);
 
 int pkpsig_simple_detached_sign(const char *paramset_name, uint8_t *sigout, const uint8_t *msg, size_t msglen, const uint8_t *secretkey);
 

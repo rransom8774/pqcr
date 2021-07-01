@@ -87,6 +87,4 @@ void pkpsig_symmetric_expand_challenge1s(struct pkpsig_sigstate *sst, int verify
 void pkpsig_symmetric_hash_commit2s(struct pkpsig_sigstate *sst, uint8_t *outbuf, int verifying);
 void pkpsig_symmetric_expand_challenge2s(struct pkpsig_sigstate *sst, int verifying);
 
-void pkpsig_symmetric_gen_fingerprint_hash(struct pkpsig_scratch_store *st, uint8_t *hash_out, const uint8_t *pkblob, size_t pkblob_len);
-
 #endif
