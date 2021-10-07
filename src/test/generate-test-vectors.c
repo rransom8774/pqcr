@@ -229,10 +229,16 @@ int main(int argc, char *argv[]) {
     return 2;
   };
 
+#ifndef _WIN32
   /* mode 0777: rely on the user's umask for consistency with other programs */
   mkdir("out", 0777);
   mkdir("out/testvecs", 0777);
   mkdir("out/testvecs/pkpsig", 0777);
+#else
+  mkdir("out");
+  mkdir("out/testvecs");
+  mkdir("out/testvecs/pkpsig");
+#endif
 
   if (paramset_name == NULL) {
     pkpsig_paramset_enumerate_names(enum_names_cb, &count);
