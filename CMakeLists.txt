@@ -83,3 +83,10 @@ target_link_libraries(generate-test-vectors-openssl PUBLIC
   pqcr_pkpsig_openssl pqcr_pkpsig_xoesch
   XKCP)
 
+add_executable(pkpsig-list-paramsets
+  src/util/pkpsig-list-paramsets.c
+  src/test/randombytes_shake256_deterministic.c)
+target_link_libraries(pkpsig-list-paramsets PUBLIC
+  pqcr_pkpsig
+  pqcr_pkpsig_xkcp pqcr_pkpsig_xoesch)
+
