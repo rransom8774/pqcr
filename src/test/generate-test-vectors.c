@@ -15,8 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <pkpsig/api_unified.h>
-#include <pkpsig/paramset.h>
+#include <pqcr/sign_api_simple.h>
 
 #include "randombytes_shake256_deterministic.h"
 
@@ -24,6 +23,11 @@
 
 #include <sys/stat.h>
 #include <sys/types.h>
+
+static uint32_t count = 10;  /* FIXME allow user to specify count */   
+static const char *algo_name = NULL;
+static const struct pqcr_sign_algo_simple *algo = NULL;
+static const char *paramset_name = NULL;
 
 static inline void pack_ui32(uint8_t *buf, uint32_t x) {
   buf[0] =  x        & 255;
@@ -61,13 +65,13 @@ static struct buffer seckeybuf = BUFFER_STATIC_INIT;
 static struct buffer msgbuf = BUFFER_STATIC_INIT;
 static struct buffer sigbuf = BUFFER_STATIC_INIT;
 
-static int init_test_buffers(const char *psname, uint32_t count) {
+static int init_test_buffers(const struct pqcr_sign_algo_simple *algo, const char *psname, uint32_t count) {
   int rv = 0;
 
-  rv |= BUFFER_RESIZE(pubkeybuf, pkpsig_simple_get_publickey_bytes(psname));
-  rv |= BUFFER_RESIZE(seckeybuf, pkpsig_simple_get_secretkey_bytes(psname));
+  rv |= BUFFER_RESIZE(pubkeybuf, algo->get_publickey_bytes(algo, psname));
+  rv |= BUFFER_RESIZE(seckeybuf, algo->get_secretkey_bytes(algo, psname));
   rv |= BUFFER_RESIZE(msgbuf, 33 * (size_t)count);
-  rv |= BUFFER_RESIZE(sigbuf, pkpsig_simple_get_signature_bytes(psname));
+  rv |= BUFFER_RESIZE(sigbuf, algo->get_signature_bytes_max(algo, psname));
 
   if (rv != 0) {
     fprintf(stderr, "data buffer allocation failed\n");
@@ -75,9 +79,9 @@ static int init_test_buffers(const char *psname, uint32_t count) {
   };
 };
 
-static int compute_test_vector(const char *psname, uint32_t i) {
+static int compute_test_vector(const struct pqcr_sign_algo_simple *algo, const char *psname, uint32_t i) {
   uint8_t buf[4];
-  int rv;
+  ssize_t rv;
   size_t msglen = 33 * (size_t)i;
 
   pack_ui32(buf, i);
@@ -91,27 +95,38 @@ static int compute_test_vector(const char *psname, uint32_t i) {
     return -1;
   };
 
+  rv = BUFFER_RESIZE(sigbuf, algo->get_signature_bytes_max(algo, psname));
+  if (rv != 0) {
+    fprintf(stderr, "signature buffer resize failed\n");
+    return -1;
+  };
+
   rv = randombytes(msgbuf.data, msgbuf.len);
   if (rv != 0) {
-    fprintf(stderr, "message buffer initialization (randombytes) failed (%i)\n", rv);
+    fprintf(stderr, "message buffer initialization (randombytes) failed (%i)\n", (int)rv);
     return -1;
   };
 
-  rv = pkpsig_simple_keypair(psname, pubkeybuf.data, seckeybuf.data);
+  rv = algo->keypair(algo, psname, pubkeybuf.data, seckeybuf.data);
   if (rv != 0) {
-    fprintf(stderr, "keypair generation failed (%i)\n", rv);
+    fprintf(stderr, "keypair generation failed (%i)\n", (int)rv);
     return -1;
   };
 
-  rv = pkpsig_simple_detached_sign(psname, sigbuf.data, msgbuf.data, msgbuf.len, seckeybuf.data);
-  if (rv != 0) {
-    fprintf(stderr, "signature generation failed (%i)\n", rv);
+  rv = algo->detached_sign(algo, psname, sigbuf.data, msgbuf.data, msgbuf.len, seckeybuf.data);
+  if (rv < 0) {
+    fprintf(stderr, "signature generation failed (%i)\n", (int)rv);
     return -1;
+  } else if (rv > sigbuf.len) {
+    fprintf(stderr, "signature generation overran buffer (%i written to %i-byte buffer)\n", (int)rv, (int)sigbuf.len);
+    return -1;
+  } else {
+    BUFFER_RESIZE(sigbuf, rv);
   };
 
-  rv = pkpsig_simple_detached_verify(psname, sigbuf.data, msgbuf.data, msgbuf.len, pubkeybuf.data);
+  rv = algo->detached_verify(algo, psname, sigbuf.data, sigbuf.len, msgbuf.data, msgbuf.len, pubkeybuf.data);
   if (rv != 0) {
-    fprintf(stderr, "signature verification failed (%i)\n", rv);
+    fprintf(stderr, "signature verification failed (%i)\n", (int)rv);
     return -1;
   };
 };
@@ -141,18 +156,18 @@ static int write_buf(FILE *f, struct buffer *pbuf) {
   return 0;
 };
 
-static int generate_test_vector_file(const char *psname, uint32_t i) {
+static int generate_test_vector_file(const struct pqcr_sign_algo_simple *algo, const char *psname, uint32_t i) {
   ssize_t fname_len;
   FILE *f = NULL;
   int rv = 0;
 
-  rv = init_test_buffers(psname, i);
+  rv = init_test_buffers(algo, psname, i);
   if (rv < 0) return rv;
 
   while (1) {
     fname_len = snprintf(fnamebuf.data, fnamebuf.capacity,
                          "out/testvecs/%s/testvec-%s-%lu.bin",
-                         "pkpsig", psname, (unsigned long)i);
+                         algo->algo_name, psname, (unsigned long)i);
     if (fname_len + 1 <= fnamebuf.capacity) {
       fnamebuf.data[fname_len] = '\0';
       fnamebuf.len = fname_len + 1;
@@ -173,7 +188,7 @@ static int generate_test_vector_file(const char *psname, uint32_t i) {
 
   write_ui32(f, i);
 
-  rv = compute_test_vector(psname, i);
+  rv = compute_test_vector(algo, psname, i);
   if (rv < 0) {
     fprintf(stderr, "error generating test vector %s\n", fnamebuf.data);
     goto end;
@@ -197,35 +212,56 @@ static int generate_test_vector_file(const char *psname, uint32_t i) {
   return rv;
 };
 
-static int enum_names_cb(void *ud, const char *name) {
-  uint32_t *pcount = ud;
+static int handle_paramset() {
   uint32_t i;
-
-  printf("%s\n", name);
-
-  for (i = 0; i < *pcount; ++i) {
-    if (generate_test_vector_file(name, i) < 0) {
+  for (i = 0; i < count; ++i) {
+    if (generate_test_vector_file(algo, paramset_name, i) < 0) {
       return 1;
     };
   };
-
   return 0;
 };
 
-int main(int argc, char *argv[]) {
-  uint32_t count = 10;  /* FIXME allow user to specify count */   
+static int enum_paramset_names_cb(void *ud, const char *psname) {
   uint32_t i;
-  const char *paramset_name = NULL;
+
+  printf("%s %s\n", algo_name, psname);
+
+  paramset_name = psname;
+  return handle_paramset();
+};
+
+static int handle_algo() {
+  if (paramset_name == NULL) {
+    return algo->enumerate_paramset_names(algo, enum_paramset_names_cb, NULL);
+  } else {
+    return handle_paramset();
+  };
+};
+
+static int enum_algo_names_cb(void *ud, const char *algname) {
+  algo_name = algname;
+  algo = pqcr_get_sign_algo_simple(algo_name);
+  paramset_name = NULL;
+  return handle_algo();
+};
+
+int main(int argc, char *argv[]) {
+  uint32_t i;
 
   switch (argc) {
+  case 3:
+    paramset_name = argv[2];
+    /* fall through */
   case 2:
-    paramset_name = argv[1];
+    algo_name = argv[1];
+    algo = pqcr_get_sign_algo_simple(algo_name);
     /* fall through */
   case 1:
     break;
   case 0:
   default:
-    fprintf(stderr, "usage: generate-test-vectors PARAMSET-NAME\n");
+    fprintf(stderr, "usage: generate-test-vectors ALGO-NAME PARAMSET-NAME\n");
     return 2;
   };
 
@@ -240,14 +276,10 @@ int main(int argc, char *argv[]) {
   mkdir("out/testvecs/pkpsig");
 #endif
 
-  if (paramset_name == NULL) {
-    pkpsig_paramset_enumerate_names(enum_names_cb, &count);
+  if (algo_name == NULL) {
+    return pqcr_enum_sign_algo_simple_names(enum_algo_names_cb, NULL);
   } else {
-    for (i = 0; i < count; ++i) {
-      if (generate_test_vector_file(paramset_name, i) < 0) {
-        return 1;
-      };
-    };
+    return handle_algo();
   };
 
   return 0;

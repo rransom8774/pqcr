@@ -13,13 +13,17 @@ CFLAGS = -g
 CFLAGS_DJBSORT = -Iinclude/djbsort/ \
 	${CFLAGS} \
 
-CFLAGS_PQCR = -Iinclude/pqcr/ \
+CFLAGS_PQCR_COMMON = -Iinclude/pqcr/ \
 	-Iinclude/djbsort/ \
 	${CFLAGS} \
 
 CFLAGS_PKPSIG = -Iinclude/pkpsig/ \
 	-Iinclude/pqcr/ \
 	-Iinclude/djbsort/ \
+	-Iinclude/ \
+	${CFLAGS} \
+
+CFLAGS_PQCR = -Iinclude/pqcr/ \
 	-Iinclude/ \
 	${CFLAGS} \
 
@@ -57,11 +61,11 @@ OBJS_DJBSORT = \
 	out/djbsort/uint32-useint32-sort.o \
 
 
-HEADERS_PQCR = \
+HEADERS_PQCR_COMMON = \
 	include/pqcr/modulo.h \
 	include/pqcr/vectenc.h \
 
-OBJS_PQCR = \
+OBJS_PQCR_COMMON = \
 	out/pqcr/modulo.o \
 	out/pqcr/vectenc.o \
 
@@ -103,6 +107,13 @@ OBJS_PKPSIG_OPENSSL = \
 	out/pkpsig/symmetric_shake_openssl.o \
 
 
+HEADERS_PQCR = \
+	include/pqcr/sign_api_simple.h \
+
+OBJS_PQCR = \
+	out/pqcr/sign_api_simple.o \
+
+
 HEADERS_XOESCH = \
 	include/xoesch/xoesch.h \
 
@@ -112,14 +123,16 @@ OBJS_XOESCH = \
 
 HEADERS_LIB = \
 	$(HEADERS_DJBSORT) \
-	$(HEADERS_PQCR) \
+	$(HEADERS_PQCR_COMMON) \
 	$(HEADERS_PKPSIG) \
+	$(HEADERS_PQCR) \
 	$(HEADERS_XOESCH) \
 
 OBJS_LIB = \
 	$(OBJS_DJBSORT) \
-	$(OBJS_PQCR) \
+	$(OBJS_PQCR_COMMON) \
 	$(OBJS_PKPSIG) \
+	$(OBJS_PQCR) \
 	$(OBJS_XOESCH) \
 
 OBJS_LIB_XKCP = \
@@ -185,11 +198,11 @@ out/djbsort/uint32-useint32-sort.o: src/djbsort/uint32-useint32-sort.c $(HEADERS
 	cc -c -o $@ $< $(CFLAGS_DJBSORT)
 
 
-out/pqcr/modulo.o: src/pqcr/modulo.c $(HEADERS_PQCR)
-	cc -c -o $@ $< $(CFLAGS_PQCR)
+out/pqcr/modulo.o: src/pqcr/modulo.c $(HEADERS_PQCR_COMMON)
+	cc -c -o $@ $< $(CFLAGS_PQCR_COMMON)
 
-out/pqcr/vectenc.o: src/pqcr/vectenc.c $(HEADERS_PQCR)
-	cc -c -o $@ $< $(CFLAGS_PQCR)
+out/pqcr/vectenc.o: src/pqcr/vectenc.c $(HEADERS_PQCR_COMMON)
+	cc -c -o $@ $< $(CFLAGS_PQCR_COMMON)
 
 
 out/pkpsig/api_unified.o: src/pkpsig/api_unified.c $(HEADERS_PKPSIG)
@@ -245,6 +258,10 @@ out/pkpsig/symmetric_xoesch384.o: src/pkpsig/symmetric_xoesch384.c src/pkpsig/sy
 
 out/pkpsig/zkpshamir.o: src/pkpsig/zkpshamir.c $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
+
+
+out/pqcr/sign_api_simple.o: src/pqcr/sign_api_simple.c $(HEADERS_PQCR)
+	cc -c -o $@ $< $(CFLAGS_PQCR)
 
 
 out/xoesch/xoesch.o: src/xoesch/xoesch.c $(HEADERS_XOESCH)
