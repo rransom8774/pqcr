@@ -1,7 +1,10 @@
 
 .DELETE_ON_ERROR:
 
-.PHONY: test-bin build-dirs
+.PHONY: all test-bin util-bin build-dirs
+
+
+all: build-dirs test-bin util-bin
 
 
 CFLAGS = -g
@@ -144,8 +147,15 @@ TESTPROGS = \
 test-bin: build-dirs $(TESTPROGS)
 
 
+UTILPROGS = \
+	out/util/pkpsig-list-paramsets \
+
+
+util-bin: build-dirs $(UTILPROGS)
+
+
 build-dirs:
-	mkdir -p out out/djbsort out/pkpsig out/pqcr out/test out/xoesch
+	mkdir -p out out/djbsort out/pkpsig out/pqcr out/test out/util out/xoesch
 
 
 out/test/generate-test-vectors: $(OBJS_GEN_TEST_VECS) $(OBJS_LIB_XKCP)
@@ -158,6 +168,13 @@ out/test/randombytes_shake256_deterministic.o: src/test/randombytes_shake256_det
 	$(CC) -c -o $@ $(CFLAGS_TEST) $<
 
 out/test/generate-test-vectors.o: src/test/generate-test-vectors.c $(HEADERS_GEN_TEST_VECS) $(HEADERS_LIB)
+	$(CC) -c -o $@ $(CFLAGS_TEST) $<
+
+
+out/util/pkpsig-list-paramsets: out/util/pkpsig-list-paramsets.o out/test/randombytes_shake256_deterministic.o $(OBJS_LIB_XKCP)
+	$(CC) -o $@ $+ $(LDFLAGS_TEST_XKCP)
+
+out/util/pkpsig-list-paramsets.o: src/util/pkpsig-list-paramsets.c $(HEADERS_GEN_TEST_VECS) $(HEADERS_LIB)
 	$(CC) -c -o $@ $(CFLAGS_TEST) $<
 
 
