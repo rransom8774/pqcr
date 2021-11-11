@@ -59,8 +59,8 @@ static char *pkpsig_get_paramset_description_fn(const struct pqcr_sign_algo_simp
   return rv;
 };
 
-static int pkpsig_keypair_fn(const struct pqcr_sign_algo_simple *algo, const char *paramset_name, uint8_t *publickey_out, uint8_t *secretkey_out) {
-  return pkpsig_simple_keypair(paramset_name, publickey_out, secretkey_out);
+static int pkpsig_keypair_fn(const struct pqcr_sign_algo_simple *algo, const char *paramset_name, uint8_t *publickey_out, uint8_t *secretkey_out, pqcr_randombytes_cb randombytes_cb, void *ud) {
+  return pkpsig_simple_keypair(paramset_name, publickey_out, secretkey_out, randombytes_cb, ud);
 };
 static int pkpsig_secretkey_to_publickey_fn(const struct pqcr_sign_algo_simple *algo, const char *paramset_name, uint8_t *publickey_out, const uint8_t *secretkey) {
   return pkpsig_simple_secretkey_to_publickey(paramset_name, publickey_out, secretkey);

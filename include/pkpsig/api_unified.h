@@ -28,7 +28,6 @@ const char *pkpsig_simple_get_hash_algo_ui_name_short(const char *paramset_name)
 const char *pkpsig_simple_get_hash_algo_ui_name_long(const char *paramset_name);
 ssize_t pkpsig_simple_get_paramset_description(const char *paramset_name, char *buf, size_t size);
 
-int pkpsig_simple_keypair(const char *paramset_name, uint8_t *publickey_out, uint8_t *secretkey_out);
 int pkpsig_simple_secretkey_to_publickey(const char *paramset_name, uint8_t *publickey_out, const uint8_t *secretkey);
 
 int pkpsig_simple_detached_sign(const char *paramset_name, uint8_t *sigout, const uint8_t *msg, size_t msglen, const uint8_t *secretkey);
@@ -38,5 +37,9 @@ int pkpsig_simple_detached_verify(const char *paramset_name, const uint8_t *sigi
 int pkpsig_simple_supercop_sign(const char *paramset_name, uint8_t *sm, size_t *smlen, const uint8_t *m, size_t mlen, const uint8_t *secretkey);
 
 int pkpsig_simple_supercop_sign_open(const char *paramset_name, uint8_t *m, size_t *mlen, const uint8_t *sm, size_t smlen, const uint8_t *publickey);
+
+typedef int (*pkpsig_randombytes_cb)(void *ud, uint8_t *out, size_t bytes);
+
+int pkpsig_simple_keypair(const char *paramset_name, uint8_t *publickey_out, uint8_t *secretkey_out, pkpsig_randombytes_cb randombytes_cb, void *ud);
 
 #endif

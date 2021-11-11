@@ -8,18 +8,11 @@
  * WARRANTY WHATSOEVER.
  */
 
-#include "randombytes_shake256_deterministic.h"
+#include "drbg.h"
 
 #include <XKCP/SimpleFIPS202.h>
 
 #include <assert.h>
-
-#define STATE_BYTES 64
-#define GENBLOCK_BYTES 2048
-#define GENBUF_BYTES (GENBLOCK_BYTES+STATE_BYTES)
-
-static uint8_t state[STATE_BYTES];
-static uint8_t genbuf[GENBUF_BYTES];
 
 static inline void pack_ui32(uint8_t *buf, uint32_t x) {
   buf[0] =  x        & 255;
@@ -28,11 +21,11 @@ static inline void pack_ui32(uint8_t *buf, uint32_t x) {
   buf[3] = (x >> 24) & 255;
 };
 
-void randombytes_shake256_det_init(uint8_t *seed, size_t seedlen) {
-  SHAKE256(state, STATE_BYTES, seed, seedlen);
+void drbg_init(struct drbg *drbg, uint8_t *seed, size_t seedlen) {
+  SHAKE256(drbg->state, STATE_BYTES, seed, seedlen);
 };
 
-int randombytes(uint8_t *out, size_t len) {
+int drbg_run(struct drbg *drbg, uint8_t *out, size_t len) {
   size_t i = 0;
   uint8_t input[STATE_BYTES + 4];
 
@@ -43,7 +36,7 @@ int randombytes(uint8_t *out, size_t len) {
     return -1;
   };
 
-  memcpy(input, state, STATE_BYTES);
+  memcpy(input, drbg->state, STATE_BYTES);
   pack_ui32(input + STATE_BYTES, (uint32_t)len);
 
   while (i < len) {
@@ -51,14 +44,14 @@ int randombytes(uint8_t *out, size_t len) {
 
     if (blocklen > GENBLOCK_BYTES) blocklen = GENBLOCK_BYTES;
 
-    SHAKE256(genbuf, STATE_BYTES + blocklen, input, sizeof(input));
-    memcpy(input, genbuf, STATE_BYTES);
-    memcpy(out + i, genbuf + STATE_BYTES, blocklen);
+    SHAKE256(drbg->genbuf, STATE_BYTES + blocklen, input, sizeof(input));
+    memcpy(input, drbg->genbuf, STATE_BYTES);
+    memcpy(out + i, drbg->genbuf + STATE_BYTES, blocklen);
 
     i += blocklen;
   };
 
-  SHAKE256(state, STATE_BYTES, input, sizeof(input));
+  SHAKE256(drbg->state, STATE_BYTES, input, sizeof(input));
 
   return 0;
 };

@@ -15,8 +15,17 @@
 
 #define TESTVEC_RANDOMBYTES_IMPL_NAME "SHAKE256"
 
-void randombytes_shake256_det_init(uint8_t *seed, size_t seedlen);
+#define STATE_BYTES 64
+#define GENBLOCK_BYTES 2048
+#define GENBUF_BYTES (GENBLOCK_BYTES+STATE_BYTES)
 
-int randombytes(uint8_t *out, size_t len);
+struct drbg {
+  uint8_t state[STATE_BYTES];
+  uint8_t genbuf[GENBUF_BYTES];
+};
+
+void drbg_init(struct drbg *drbg, uint8_t *seed, size_t seedlen);
+
+int drbg_run(struct drbg *drbg, uint8_t *out, size_t len);
 
 #endif

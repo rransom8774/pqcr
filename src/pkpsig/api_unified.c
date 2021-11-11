@@ -109,7 +109,7 @@ ssize_t pkpsig_simple_get_paramset_description(const char *paramset_name, char *
   return rv;
 };
 
-int pkpsig_simple_keypair(const char *paramset_name, uint8_t *publickey_out, uint8_t *secretkey_out) {
+int pkpsig_simple_keypair(const char *paramset_name, uint8_t *publickey_out, uint8_t *secretkey_out, pkpsig_randombytes_cb randombytes_cb, void *ud) {
   struct pkpsig_paramset *ps = pkpsig_paramset_alloc_by_name(paramset_name);
   struct pkpsig_scratch_store *st = NULL;
   struct pkpsig_keysecret *key = NULL;
@@ -144,7 +144,7 @@ int pkpsig_simple_keypair(const char *paramset_name, uint8_t *publickey_out, uin
     goto end;
   };
 
-  pkpsig_key_generate(st, key);
+  pkpsig_key_generate(st, key, randombytes_cb, ud);
 
   memcpy(publickey_out, key->pub.pkblob, pkblob_bytes);
   memcpy(secretkey_out, key->skblob, skblob_bytes);

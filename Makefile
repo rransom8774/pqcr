@@ -75,7 +75,6 @@ HEADERS_PKPSIG = \
 	include/pkpsig/keys.h \
 	include/pkpsig/paramset.h \
 	include/pkpsig/permute.h \
-	include/pkpsig/randombytes.h \
 	include/pkpsig/signatures.h \
 	include/pkpsig/sigstate.h \
 	include/pkpsig/sort.h \
@@ -90,7 +89,6 @@ OBJS_PKPSIG = \
 	out/pkpsig/keys_unpack.o \
 	out/pkpsig/paramset.o \
 	out/pkpsig/permute.o \
-	out/pkpsig/randombytes.o \
 	out/pkpsig/signatures.o \
 	out/pkpsig/sigstate.o \
 	out/pkpsig/sort_blob.o \
@@ -145,11 +143,11 @@ OBJS_LIB_OPENSSL = \
 
 
 HEADERS_GEN_TEST_VECS = \
-	src/test/randombytes_shake256_deterministic.h \
+	src/test/drbg.h \
 
 OBJS_GEN_TEST_VECS = \
 	out/test/generate-test-vectors.o \
-	out/test/randombytes_shake256_deterministic.o \
+	out/test/drbg.o \
 
 
 TESTPROGS = \
@@ -177,17 +175,17 @@ out/test/generate-test-vectors: $(OBJS_GEN_TEST_VECS) $(OBJS_LIB_XKCP)
 out/test/generate-test-vectors-openssl: $(OBJS_GEN_TEST_VECS) $(OBJS_LIB_OPENSSL)
 	$(CC) -o $@ $+ $(LDFLAGS_TEST_OPENSSL)
 
-out/test/randombytes_shake256_deterministic.o: src/test/randombytes_shake256_deterministic.c $(HEADERS_GEN_TEST_VECS)
+out/test/drbg.o: src/test/drbg.c $(HEADERS_GEN_TEST_VECS)
 	$(CC) -c -o $@ $(CFLAGS_TEST) $<
 
 out/test/generate-test-vectors.o: src/test/generate-test-vectors.c $(HEADERS_GEN_TEST_VECS) $(HEADERS_LIB)
 	$(CC) -c -o $@ $(CFLAGS_TEST) $<
 
 
-out/util/pkpsig-list-paramsets: out/util/pkpsig-list-paramsets.o out/test/randombytes_shake256_deterministic.o $(OBJS_LIB_XKCP)
+out/util/pkpsig-list-paramsets: out/util/pkpsig-list-paramsets.o $(OBJS_LIB_XKCP)
 	$(CC) -o $@ $+ $(LDFLAGS_TEST_XKCP)
 
-out/util/pkpsig-list-paramsets.o: src/util/pkpsig-list-paramsets.c $(HEADERS_GEN_TEST_VECS) $(HEADERS_LIB)
+out/util/pkpsig-list-paramsets.o: src/util/pkpsig-list-paramsets.c $(HEADERS_LIB)
 	$(CC) -c -o $@ $(CFLAGS_TEST) $<
 
 
@@ -224,9 +222,6 @@ out/pkpsig/paramset.o: src/pkpsig/paramset.c $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
 out/pkpsig/permute.o: src/pkpsig/permute.c $(HEADERS_PKPSIG)
-	cc -c -o $@ $< $(CFLAGS_PKPSIG)
-
-out/pkpsig/randombytes.o: src/pkpsig/randombytes.c $(HEADERS_PKPSIG)
 	cc -c -o $@ $< $(CFLAGS_PKPSIG)
 
 out/pkpsig/signatures.o: src/pkpsig/signatures.c $(HEADERS_PKPSIG)

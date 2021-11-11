@@ -44,9 +44,11 @@ struct pkpsig_keysecret *pkpsig_key_secret_new(const struct pkpsig_paramset *ps)
 void pkpsig_key_secret_zero(struct pkpsig_keysecret *key);
 void pkpsig_key_secret_free(struct pkpsig_keysecret *key);
 
-void pkpsig_key_generate(struct pkpsig_scratch_store *st, struct pkpsig_keysecret *key);
-
 int pkpsig_key_unpack_skblob(struct pkpsig_scratch_store *st, struct pkpsig_keysecret *key);
 int pkpsig_key_unpack_pkblob(struct pkpsig_scratch_store *st, struct pkpsig_keypublic *pub);
+
+typedef int (*pkpsig_randombytes_cb)(void *ud, uint8_t *out, size_t bytes);
+
+void pkpsig_key_generate(struct pkpsig_scratch_store *st, struct pkpsig_keysecret *key, pkpsig_randombytes_cb randombytes_cb, void *ud);
 
 #endif

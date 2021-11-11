@@ -17,7 +17,7 @@
 
 #include <pqcr/sign_api_simple.h>
 
-#include "randombytes_shake256_deterministic.h"
+#include "drbg.h"
 
 #include <XKCP/KeccakSponge.h>
 
@@ -79,13 +79,18 @@ static int init_test_buffers(const struct pqcr_sign_algo_simple *algo, const cha
   };
 };
 
+static int randombytes_cb(void *ud, uint8_t *out, size_t bytes) {
+  return drbg_run(ud, out, bytes);
+};
+
 static int compute_test_vector(const struct pqcr_sign_algo_simple *algo, const char *psname, uint32_t i) {
+  struct drbg drbg;
   uint8_t buf[4];
   ssize_t rv;
   size_t msglen = 33 * (size_t)i;
 
   pack_ui32(buf, i);
-  randombytes_shake256_det_init(buf, 4);
+  drbg_init(&drbg, buf, 4);
 
   /* FIXME does not reinitialize buffer sizes */     
 
@@ -101,13 +106,13 @@ static int compute_test_vector(const struct pqcr_sign_algo_simple *algo, const c
     return -1;
   };
 
-  rv = randombytes(msgbuf.data, msgbuf.len);
+  rv = drbg_run(&drbg, msgbuf.data, msgbuf.len);
   if (rv != 0) {
     fprintf(stderr, "message buffer initialization (randombytes) failed (%i)\n", (int)rv);
     return -1;
   };
 
-  rv = algo->keypair(algo, psname, pubkeybuf.data, seckeybuf.data);
+  rv = algo->keypair(algo, psname, pubkeybuf.data, seckeybuf.data, randombytes_cb, &drbg);
   if (rv != 0) {
     fprintf(stderr, "keypair generation failed (%i)\n", (int)rv);
     return -1;

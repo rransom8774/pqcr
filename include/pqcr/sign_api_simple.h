@@ -16,6 +16,7 @@
 #include <sys/types.h>
 
 typedef int (*pqcr_enumerate_names_cb)(void *ud, const char *name);
+typedef int (*pqcr_randombytes_cb)(void *ud, uint8_t *out, size_t bytes);
 
 struct pqcr_sign_algo_simple {
   const char *algo_name;
@@ -34,7 +35,7 @@ struct pqcr_sign_algo_simple {
   const char *(*get_hash_algo_id)(const struct pqcr_sign_algo_simple *algo, const char *paramset_name);
   char *(*get_paramset_description)(const struct pqcr_sign_algo_simple *algo, const char *paramset_name);
 
-  int (*keypair)(const struct pqcr_sign_algo_simple *algo, const char *paramset_name, uint8_t *publickey_out, uint8_t *secretkey_out);
+  int (*keypair)(const struct pqcr_sign_algo_simple *algo, const char *paramset_name, uint8_t *publickey_out, uint8_t *secretkey_out, pqcr_randombytes_cb randombytes_cb, void *ud);
   int (*secretkey_to_publickey)(const struct pqcr_sign_algo_simple *algo, const char *paramset_name, uint8_t *publickey_out, const uint8_t *secretkey);
 
   ssize_t (*detached_sign)(const struct pqcr_sign_algo_simple *algo, const char *paramset_name, uint8_t *sigout, const uint8_t *msg, size_t msglen, const uint8_t *secretkey);
