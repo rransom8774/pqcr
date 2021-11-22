@@ -18,8 +18,12 @@
 typedef int (*pqcr_enumerate_names_cb)(void *ud, const char *name);
 typedef int (*pqcr_randombytes_cb)(void *ud, uint8_t *out, size_t bytes);
 
+#define PQCR_SIGN_ALGO_PARSES_PARAMSET_NAMES (((uint32_t)1) << 0)
+
 struct pqcr_sign_algo_simple {
   const char *algo_name;
+
+  uint32_t flags;
 
   ssize_t (*get_publickey_bytes)(const struct pqcr_sign_algo_simple *algo, const char *paramset_name);
   ssize_t (*get_secretkey_bytes)(const struct pqcr_sign_algo_simple *algo, const char *paramset_name);

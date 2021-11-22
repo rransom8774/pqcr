@@ -109,6 +109,7 @@ static int generic_supercop_sign_open_fn(const struct pqcr_sign_algo_simple *alg
 
 static const struct pqcr_sign_algo_simple algo_pkpsig = {
   "pkpsig",
+  0,
 
   pkpsig_get_publickey_bytes_fn,
   pkpsig_get_secretkey_bytes_fn,
