@@ -16,11 +16,11 @@
 struct spx_paramset {
   char *name;
   uint16_t hash_bytes; /* n */
+  uint16_t winternitz_base; /* w */
   uint16_t hypertree_height; /* h */
   uint16_t hypertree_depth; /* d */
   uint16_t fors_leaves; /* log(t), lt */
   uint16_t fors_trees; /* k */
-  uint16_t winternitz_base; /* w */
 };
 
 struct spx_paramset *spx_paramset_alloc_by_name(const char *name);
