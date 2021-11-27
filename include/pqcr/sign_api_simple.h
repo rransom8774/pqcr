@@ -32,6 +32,8 @@ struct pqcr_sign_algo_simple {
 
   int (*enumerate_paramset_names)(const struct pqcr_sign_algo_simple *algo, pqcr_enumerate_names_cb cb, void *ud);
 
+  char *(*canonicalize_paramset_name)(const struct pqcr_sign_algo_simple *algo, const char *paramset_name);
+
   char *(*ui_seclevel_bits_to_paramset_name)(const struct pqcr_sign_algo_simple *algo, int bits);
   int (*paramset_name_to_ui_seclevel_bits)(const struct pqcr_sign_algo_simple *algo, const char *paramset_name);
   int (*paramset_name_to_keygen_entropy_bits)(const struct pqcr_sign_algo_simple *algo, const char *paramset_name);

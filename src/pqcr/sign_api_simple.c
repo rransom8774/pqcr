@@ -31,6 +31,16 @@ static int pkpsig_enumerate_paramset_names_fn(const struct pqcr_sign_algo_simple
   pkpsig_paramset_enumerate_names(cb, ud);
 };
 
+static char *pkpsig_canonicalize_paramset_name_fn(const struct pqcr_sign_algo_simple *algo, const char *paramset_name) {
+  char *rv = NULL;
+  struct pkpsig_paramset *ps = pkpsig_paramset_alloc_by_name(paramset_name);
+  if (ps == NULL) return NULL;
+  rv = ps->name;
+  ps->name = NULL; /* prevent name from being free()d */
+  pkpsig_paramset_free(ps);
+  return rv;
+};
+
 static char *pkpsig_ui_sl_bits_to_ps_name_fn(const struct pqcr_sign_algo_simple *algo, int bits) {
   return pkpsig_simple_ui_seclevel_bits_to_paramset_name(bits);
 };
@@ -117,6 +127,8 @@ static const struct pqcr_sign_algo_simple algo_pkpsig = {
   pkpsig_get_signature_bytes_fn,
 
   pkpsig_enumerate_paramset_names_fn,
+
+  pkpsig_canonicalize_paramset_name_fn,
 
   pkpsig_ui_sl_bits_to_ps_name_fn,
   pkpsig_ps_name_to_ui_sl_bits_fn,
