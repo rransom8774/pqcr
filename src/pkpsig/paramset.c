@@ -73,62 +73,14 @@ struct paramset_data {
   uint8_t n_runs_long;
   uint8_t i_sig_seclevel;
 };
-static const struct paramset_data paramsets_q797n55m25kc1a[] = {
-  {127, 73, SECLEVEL_c1a},
-  {105, 57, SECLEVEL_c1},
-  {99, 47, SECLEVEL_b112},
-  {99, 47, SECLEVEL_b112git},
-  {83, 41, SECLEVEL_b96},
-  {67, 35, SECLEVEL_b80},
+static const struct paramset_data paramsets_q53n106m53kc5[] = {
+  {231, 138, SECLEVEL_c5},
+  {238, 135, SECLEVEL_c4},
   {0, 0, 0}
 };
-static const struct paramset_data paramsets_q977n61m28kc2[] = {
-  {158, 84, SECLEVEL_c2},
-  {135, 69, SECLEVEL_c1a},
-  {108, 55, SECLEVEL_c1},
-  {95, 48, SECLEVEL_b112},
-  {95, 48, SECLEVEL_b112git},
-  {80, 42, SECLEVEL_b96},
-  {72, 33, SECLEVEL_b80},
-  {0, 0, 0}
-};
-static const struct paramset_data paramsets_q1409n87m42kc4[] = {
-  {216, 108, SECLEVEL_c4},
-  {160, 82, SECLEVEL_c3},
-  {178, 76, SECLEVEL_c2},
-  {143, 65, SECLEVEL_c1a},
-  {115, 52, SECLEVEL_c1},
-  {105, 44, SECLEVEL_b112},
-  {105, 44, SECLEVEL_b112git},
-  {83, 40, SECLEVEL_b96},
-  {77, 31, SECLEVEL_b80},
-  {0, 0, 0}
-};
-static const struct paramset_data paramsets_q1789n111m55kc5[] = {
-  {232, 102, SECLEVEL_c5},
-  {242, 99, SECLEVEL_c4},
-  {176, 76, SECLEVEL_c3},
-  {199, 70, SECLEVEL_c2},
-  {163, 59, SECLEVEL_c1a},
-  {136, 46, SECLEVEL_c1},
-  {112, 42, SECLEVEL_b112},
-  {121, 40, SECLEVEL_b112git},
-  {100, 35, SECLEVEL_b96},
-  {85, 29, SECLEVEL_b80},
-  {0, 0, 0}
-};
-static const struct paramset_data paramsets_q1789n111m55kc6[] = {
-  {314, 164, SECLEVEL_c6},
-  {203, 112, SECLEVEL_c5},
-  {211, 109, SECLEVEL_c4},
-  {158, 82, SECLEVEL_c3},
-  {176, 76, SECLEVEL_c2},
-  {148, 63, SECLEVEL_c1a},
-  {113, 52, SECLEVEL_c1},
-  {100, 45, SECLEVEL_b112},
-  {100, 45, SECLEVEL_b112git},
-  {85, 39, SECLEVEL_b96},
-  {72, 32, SECLEVEL_b80},
+static const struct paramset_data paramsets_q59n118m59kc5[] = {
+  {230, 136, SECLEVEL_c5},
+  {245, 130, SECLEVEL_c4},
   {0, 0, 0}
 };
 
@@ -142,11 +94,8 @@ struct keyparams_data {
 static const struct keyparams_data keyparamsets[] = {
 #define DEFINE_KEYPARAMSET(Q, N, M, KSL, KF) \
   {"q" #Q "n" #N "m" #M "k" #KSL, Q, N, M, SECLEVEL_##KSL, KEYFMT_##KF, paramsets_q##Q##n##N##m##M##k##KSL}
-  DEFINE_KEYPARAMSET(797,55,25,c1a,B128),
-  DEFINE_KEYPARAMSET(977,61,28,c2,B128),
-  DEFINE_KEYPARAMSET(1409,87,42,c4,B192),
-  DEFINE_KEYPARAMSET(1789,111,55,c5,B256),
-  DEFINE_KEYPARAMSET(1789,111,55,c6,B256),
+  DEFINE_KEYPARAMSET(53,106,53,c5,B256),
+  DEFINE_KEYPARAMSET(59,118,59,c5,B256),
 #undef DEFINE_KEYPARAMSET
   {NULL, 0, 0, 0, 0, 0, NULL}
 };

@@ -72,9 +72,6 @@ void pkpsig_scratch_store_zero_algo_state(struct pkpsig_scratch_store *st);
 #define HASHCTX_INTERNAL_GENBLINDINGSEEDGENSEED 0x81
 #define HASHCTX_INTERNAL_GENBLINDINGSEED 0x82
 
-#define HASHIDX_PUBPARAMS_V 0
-/* indices PKP_M through PKP_N-1 are also used for matrix columns */
-
 #define HASHIDX_SECKEYSEEDEXPAND_PI_INV 0
 
 #define HASHIDX_EXPANDBLINDINGSEED_RUN_INDEX_FACTOR 256

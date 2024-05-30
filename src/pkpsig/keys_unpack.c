@@ -25,6 +25,7 @@ int pkpsig_key_unpack_skblob_internal(struct pkpsig_scratch_store *st, struct pk
   uint8_t *skblob_checksum = key->skblob + (keyfmt->bytes_pubparamseed +
                                             keyfmt->bytes_seckeyseed +
                                             keyfmt->bytes_saltgenseed);
+  size_t n = key->pub.kp.ps->pkpparams->n;
   size_t m = key->pub.kp.ps->pkpparams->m;
   size_t i;
   union {
@@ -41,7 +42,7 @@ int pkpsig_key_unpack_skblob_internal(struct pkpsig_scratch_store *st, struct pk
   memcpy(key->pub.pkblob, key->skblob, keyfmt->bytes_pubparamseed);
 
   /* unpack public params */
-  (void)pkpsig_symmetric_expand_v(st, &(key->pub.kp), key->skblob, 0);
+  for (i = 0; i < n; ++i) key->pub.kp.v[i] = pqcr_modulus_modulo(&(key->pub.kp.ps->pkpparams->q), i);
   pkpsig_symmetric_expand_A(st, &(key->pub.kp), key->skblob);
 
   /* unpack secret key */
@@ -92,11 +93,12 @@ int pkpsig_key_unpack_pkblob(struct pkpsig_scratch_store *st, struct pkpsig_keyp
   uint8_t *u_bytes = pub->pkblob + pub->kp.ps->keyfmt->bytes_pubparamseed;
   uint32_t *vecbuf = st->vecbuf;
   uint16_t *u = pub->u;
+  size_t n = ps->pkpparams->n;
   size_t m = ps->pkpparams->m;
   size_t i;
 
   /* unpack public params */
-  (void)pkpsig_symmetric_expand_v(st, &(pub->kp), pub->pkblob, 0);
+  for (i = 0; i < n; ++i) pub->kp.v[i] = pqcr_modulus_modulo(&(pub->kp.ps->pkpparams->q), i);
   pkpsig_symmetric_expand_A(st, &(pub->kp), pub->pkblob);
 
   /* decode the public key vector */

@@ -66,7 +66,6 @@ void pkpsig_scratch_store_zero_bufs(struct pkpsig_scratch_store *st);
 void pkpsig_scratch_store_free_bufs(struct pkpsig_scratch_store *st);
 void pkpsig_scratch_store_free(struct pkpsig_scratch_store *st);
 
-int pkpsig_symmetric_expand_v(struct pkpsig_scratch_store *st, struct pkpsig_keyparams *kp, const uint8_t *seed, int check_distinct);
 void pkpsig_symmetric_expand_A(struct pkpsig_scratch_store *st, struct pkpsig_keyparams *kp, const uint8_t *seed);
 
 void pkpsig_symmetric_expand_pi_inv(struct pkpsig_scratch_store *st, struct pkpsig_keysecret *key, const uint8_t *seed);

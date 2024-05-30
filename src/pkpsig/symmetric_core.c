@@ -310,28 +310,6 @@ static int expand_fqvec(struct pkpsig_scratch_store *st, const struct pkpsig_par
   return 0;
 };
 
-int pkpsig_symmetric_expand_v(struct pkpsig_scratch_store *st, struct pkpsig_keyparams *kp, const uint8_t *seed, int check_distinct) {
-  size_t i;
-  size_t n = kp->ps->pkpparams->n;
-  size_t padlen;
-
-  st->algo->hash_init(st, HASHCTX_PUBPARAMS, seed, kp->ps->keyfmt->bytes_pubparamseed);
-  st->algo->hash_index(st, HASHIDX_PUBPARAMS_V);
-
-  (void)expand_fqvec(st, kp->ps, kp->v, n, 0);
-
-  if (check_distinct) {
-    /* check for distinct elements */
-    /* relies on expand_fqvec leaving v in vecbuf */
-    padlen = pkpsig_sort_posint32_pad_sortbuf(st->vecbuf, n);
-    pkpsig_sort_posint32(st->vecbuf, padlen);
-    for (i = 1; i < n; ++i) {
-      if (st->vecbuf[i-1] == st->vecbuf[i]) return -1;
-    };
-  };
-  return 0;
-};
-
 void pkpsig_symmetric_expand_A(struct pkpsig_scratch_store *st, struct pkpsig_keyparams *kp, const uint8_t *seed) {
   size_t i;
   size_t m = kp->ps->pkpparams->m;
