@@ -118,6 +118,17 @@ static int compute_test_vector(const struct pqcr_sign_algo_simple *algo, const c
     return -1;
   };
 
+  assert(sigbuf.len >= pubkeybuf.len);
+  rv = algo->secretkey_to_publickey(algo, psname, sigbuf.data, seckeybuf.data);
+  if (rv != 0) {
+    fprintf(stderr, "public key recovery reported failure (%i)\n", (int)rv);
+    return -1;
+  };
+  if (memcmp(sigbuf.data, pubkeybuf.data, pubkeybuf.len) != 0) {
+    fprintf(stderr, "public key recovery returned incorrect result\n");
+    return -1;
+  };
+
   rv = algo->detached_sign(algo, psname, sigbuf.data, msgbuf.data, msgbuf.len, seckeybuf.data);
   if (rv < 0) {
     fprintf(stderr, "signature generation failed (%i)\n", (int)rv);
