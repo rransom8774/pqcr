@@ -172,8 +172,9 @@ static struct pkpsig_paramset *alloc_paramset_from_data(const struct keyparams_d
     goto err;
   };
 
-  name_len = snprintf(name_buf, sizeof(name_buf), "%s-%s-s%s%s%c",
+  name_len = snprintf(name_buf, sizeof(name_buf), "%s-%s-s%srs%drL%d%s%c",
                       kp->name, symalg, ps->seclevel_signature->name,
+		      ps->nruns_short, ps->nruns_long,
                       flag ? "-" : "", flag);
   if (name_len > sizeof(name_buf) - 1) goto err;
   ps->name = strdup(name_buf);
@@ -233,8 +234,15 @@ static struct pkpsig_paramset *alloc_paramset_from_data(const struct keyparams_d
   return NULL;
 };
 
+static int strheadmatch(const char *head, const char *s) {
+  size_t len = strlen(head);
+  size_t lens = strlen(s);
+  if (lens < len) return 0;
+  return !memcmp(head, s, len);
+};
+
 struct pkpsig_paramset *pkpsig_paramset_alloc_by_name(const char *name) {
-  char name_buf[128];
+  char name_buf[128], parts_buf[64];
   char *p;
   const struct keyparams_data *kp;
   const char *symalg;
@@ -269,7 +277,10 @@ struct pkpsig_paramset *pkpsig_paramset_alloc_by_name(const char *name) {
   has_flag = (p[len] == '-');
   p[len] = '\0';
   for (psd = kp->paramsets; psd->n_runs_short != 0; ++psd) {
-    if (strcmp(p, seclevels[psd->i_sig_seclevel].name) == 0) break;
+    snprintf(parts_buf, sizeof(parts_buf), "%srs%drL%d",
+	     seclevels[psd->i_sig_seclevel].name,
+	     psd->n_runs_short, psd->n_runs_long);
+    if (strcmp(parts_buf, p) == 0) break;
   };
   if (psd->n_runs_short == 0) return NULL;
 
@@ -373,23 +384,26 @@ static int enum_symalg_cb(void *ud, const char *symalg) {
   };
 
   for (psd = kp->paramsets; psd->n_runs_short != 0; ++psd) {
-    name_len = snprintf(name_buf, sizeof(name_buf), "%s-%s-s%s",
+    name_len = snprintf(name_buf, sizeof(name_buf), "%s-%s-s%srs%drL%d",
                         kp->name, symalg,
-                        seclevels[psd->i_sig_seclevel].name);
+                        seclevels[psd->i_sig_seclevel].name,
+			psd->n_runs_short, psd->n_runs_long);
     if (name_len > sizeof(name_buf) - 1) continue;
     rv = cb(caller_ud, name_buf);
     if (rv != 0) return rv;
 
-    name_len = snprintf(name_buf, sizeof(name_buf), "%s-%s-s%s-u",
+    name_len = snprintf(name_buf, sizeof(name_buf), "%s-%s-s%srs%drL%d-u",
                         kp->name, symalg,
-                        seclevels[psd->i_sig_seclevel].name);
+                        seclevels[psd->i_sig_seclevel].name,
+			psd->n_runs_short, psd->n_runs_long);
     if (name_len > sizeof(name_buf) - 1) continue;
     rv = cb(caller_ud, name_buf);
     if (rv != 0) return rv;
 
-    name_len = snprintf(name_buf, sizeof(name_buf), "%s-%s-s%s-m",
+    name_len = snprintf(name_buf, sizeof(name_buf), "%s-%s-s%srs%drL%d-m",
                         kp->name, symalg,
-                        seclevels[psd->i_sig_seclevel].name);
+                        seclevels[psd->i_sig_seclevel].name,
+			psd->n_runs_short, psd->n_runs_long);
     if (name_len > sizeof(name_buf) - 1) continue;
     rv = cb(caller_ud, name_buf);
     if (rv != 0) return rv;
