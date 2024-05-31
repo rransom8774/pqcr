@@ -316,7 +316,10 @@ void pkpsig_symmetric_expand_A(struct pkpsig_scratch_store *st, struct pkpsig_ke
   size_t m = kp->ps->pkpparams->m;
   size_t n = kp->ps->pkpparams->n;
 
+  assert(sizeof(uint16_t) == sizeof(kp->ps->pkpparams->q.orig));
+
   st->algo->hash_init(st, HASHCTX_PUBPARAMS, seed, kp->ps->keyfmt->bytes_pubparamseed);
+  st->algo->hash_ui16vec(st, &(kp->ps->pkpparams->q.orig), 1);
   pkpsig_scratch_store_set_prefix(st);
 
   for (i = m; i < n; ++i) {
@@ -369,7 +372,10 @@ void pkpsig_symmetric_expand_pi_inv(struct pkpsig_scratch_store *st, struct pkps
   size_t n = ps->pkpparams->n;
   size_t seedbytes = ps->keyfmt->bytes_seckeyseed;
 
+  assert(sizeof(uint16_t) == sizeof(ps->pkpparams->q.orig));
+
   st->algo->hash_init(st, HASHCTX_SECKEYSEEDEXPAND, seed, seedbytes);
+  st->algo->hash_ui16vec(st, &(ps->pkpparams->q.orig), 1);
   st->algo->hash_index(st, HASHIDX_SECKEYSEEDEXPAND_PI_INV);
 
   (void)expand_perm(st, ps, key->pi_inv, 0);
@@ -385,7 +391,10 @@ void pkpsig_symmetric_expand_pubparamseed_from_seckeyseed(struct pkpsig_scratch_
   size_t n = ps->pkpparams->n;
   size_t seedbytes = ps->keyfmt->bytes_seckeyseed;
 
+  assert(sizeof(uint16_t) == sizeof(ps->pkpparams->q.orig));
+
   st->algo->hash_init(st, HASHCTX_SECKEYSEEDEXPAND, seed, seedbytes);
+  st->algo->hash_ui16vec(st, &(ps->pkpparams->q.orig), 1);
   st->algo->hash_index(st, HASHIDX_SECKEYSEEDEXPAND_PUBPARAMSSEED);
 
   st->algo->expand(st, key->pub.pkblob, ps->keyfmt->bytes_pubparamseed);
@@ -456,13 +465,17 @@ void pkpsig_symmetric_gen_blindingseeds(struct pkpsig_sigstate *sst) {
   uint16_t i, nruns;
   int uniform_rv;
   uint8_t ctx_gbs = HASHCTX_INTERNAL_GENBLINDINGSEED;
-  uint8_t index_buf[4];
-  struct pkpsig_chunk chunks[3] =
+  uint8_t q_buf[2], index_buf[4];
+  struct pkpsig_chunk chunks[4] =
     { { &ctx_gbs, 1 },
       { sst->bsg_buf, bsgs_bytes },
+      { q_buf, 2 },
       { index_buf, 4 } };
 
+  assert(sizeof(uint16_t) == sizeof(ps->pkpparams->q.orig));
+
   st->algo->hash_init(st, HASHCTX_INTERNAL_GENBLINDINGSEEDGENSEED, sst->key->skblob, pubsecseeds_bytes);
+  st->algo->hash_ui16vec(st, &(ps->pkpparams->q.orig), 1);
   st->algo->hash_chunk(st, sst->salt_and_msghash, key_crhash_bytes * 2);
   st->algo->expand(st, sst->blindingseedgenseed, bsgs_bytes);
 
@@ -473,13 +486,15 @@ void pkpsig_symmetric_gen_blindingseeds(struct pkpsig_sigstate *sst) {
     run->run_index = i;
 
     memcpy(sst->bsg_buf, sst->blindingseedgenseed, bsgs_bytes);
+    pack_ui16(q_buf, ps->pkpparams->q.orig);
 
     do {
       pack_ui32(index_buf, run->run_index);
       st->algo->XOF_chunked_input(st, sst->bsg_buf, bsgs_bytes + key_preimage_bytes,
-                                  chunks, 3);
+                                  chunks, 4);
 
       st->algo->hash_init(st, HASHCTX_EXPANDBLINDINGSEED, sst->salt_and_msghash, key_crhash_bytes * 2);
+      st->algo->hash_ui16vec(st, &(ps->pkpparams->q.orig), 1);
       pkpsig_scratch_store_set_prefix(st);
       uniform_rv = expand_blindingseed(st, ps, run, sst->bsg_buf + bsgs_bytes, key_preimage_bytes, sig_crhash_bytes, 1);
     } while (uniform_rv != 0);
@@ -503,6 +518,7 @@ void pkpsig_symmetric_expand_blindingseeds(struct pkpsig_sigstate *sst) {
   struct pkpsig_sigstate_run *run;
 
   st->algo->hash_init(st, HASHCTX_EXPANDBLINDINGSEED, sst->salt_and_msghash, key_crhash_bytes * 2);
+  st->algo->hash_ui16vec(st, &(ps->pkpparams->q.orig), 1);
   pkpsig_scratch_store_set_prefix(st);
 
   /* This routine is called during verification only, so the runs with
