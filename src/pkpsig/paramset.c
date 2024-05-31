@@ -63,9 +63,9 @@ static const struct pkpsig_seclevel seclevels[] =
 #define KEYFMT_B256 2
 #define N_KEYFMTS   3
 static const struct pkpsig_keyfmt keyfmts[N_KEYFMTS] =
-  { { 17, 32, 32,  8,  64 },
-    { 25, 48, 48, 12,  96 },
-    { 33, 64, 64, 16, 128 },
+  { { 32, 32, 32,  64 },
+    { 48, 48, 48,  96 },
+    { 64, 64, 64, 128 },
   };
 
 struct paramset_data {
@@ -496,10 +496,8 @@ size_t pkpsig_paramset_get_pkblob_bytes(const struct pkpsig_paramset *ps) {
 size_t pkpsig_paramset_get_skblob_bytes(const struct pkpsig_paramset *ps) {
   const struct pkpsig_keyfmt *keyfmt = ps->keyfmt;
 
-  return (keyfmt->bytes_pubparamseed +
-          keyfmt->bytes_seckeyseed +
-          keyfmt->bytes_saltgenseed +
-          keyfmt->bytes_seckeychecksum);
+  return (keyfmt->bytes_seckeyseed +
+          keyfmt->bytes_saltgenseed);
 };
 
 size_t pkpsig_paramset_get_sig_bytes(const struct pkpsig_paramset *ps) {

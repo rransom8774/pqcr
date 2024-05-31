@@ -22,11 +22,10 @@ void pkpsig_key_generate(struct pkpsig_scratch_store *st, struct pkpsig_keysecre
   assert(st->ps == key->pub.kp.ps);
 
   /* Generate the most secret part first, as a separate RNG call */
-  randombytes_cb(ud, key->skblob + keyfmt->bytes_pubparamseed, keyfmt->bytes_seckeyseed);
-  randombytes_cb(ud, key->skblob + keyfmt->bytes_pubparamseed + keyfmt->bytes_seckeyseed,
+  randombytes_cb(ud, key->skblob, keyfmt->bytes_seckeyseed);
+  randombytes_cb(ud, key->skblob + keyfmt->bytes_seckeyseed,
                      keyfmt->bytes_saltgenseed);
-  randombytes_cb(ud, key->skblob, keyfmt->bytes_pubparamseed);
 
-  pkpsig_key_unpack_skblob_internal(st, key, 1);
+  pkpsig_key_unpack_skblob_internal(st, key);
 };
 

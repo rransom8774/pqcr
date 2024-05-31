@@ -69,7 +69,7 @@ void pkpsig_scratch_store_free(struct pkpsig_scratch_store *st);
 void pkpsig_symmetric_expand_A(struct pkpsig_scratch_store *st, struct pkpsig_keyparams *kp, const uint8_t *seed);
 
 void pkpsig_symmetric_expand_pi_inv(struct pkpsig_scratch_store *st, struct pkpsig_keysecret *key, const uint8_t *seed);
-void pkpsig_symmetric_seckeychecksum(struct pkpsig_scratch_store *st, struct pkpsig_keysecret *key, uint8_t *outbuf);
+void pkpsig_symmetric_expand_pubparamseed_from_seckeyseed(struct pkpsig_scratch_store *st, struct pkpsig_keysecret *key, const uint8_t *seed);
 
 void pkpsig_symmetric_gen_msghash_salt(struct pkpsig_sigstate *sst, const uint8_t *message, size_t messagelen);
 

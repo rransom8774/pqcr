@@ -43,7 +43,6 @@ struct pkpsig_keyfmt {
   size_t bytes_pubparamseed;
   size_t bytes_seckeyseed;
   size_t bytes_saltgenseed;
-  size_t bytes_seckeychecksum;
 
   size_t bytes_blindingseedgenseed;
 };

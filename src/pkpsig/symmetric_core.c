@@ -113,7 +113,8 @@ void pkpsig_scratch_store_set_paramset(struct pkpsig_scratch_store *st, const st
   /* Compute maximum size of tmpbuf and store it in tmpbuf_bytes */
 
   /* Uses of tmpbuf:
-     - shake256_hash_ui16vec: n*2 or m*2 */
+     - shake256_hash_ui16vec: n*2 or m*2
+     - pkpsig_key_unpack_skblob_internal (as uint16_t *): n*2 */
   len = st->tmpbuf_bytes;
   assert(m < n);
   /* clmqoj(m * 2); */
@@ -366,7 +367,7 @@ static int expand_perm(struct pkpsig_scratch_store *st, const struct pkpsig_para
 void pkpsig_symmetric_expand_pi_inv(struct pkpsig_scratch_store *st, struct pkpsig_keysecret *key, const uint8_t *seed) {
   const struct pkpsig_paramset *ps = key->pub.kp.ps;
   size_t n = ps->pkpparams->n;
-  size_t seedbytes = ps->keyfmt->bytes_pubparamseed + ps->keyfmt->bytes_seckeyseed;
+  size_t seedbytes = ps->keyfmt->bytes_seckeyseed;
 
   st->algo->hash_init(st, HASHCTX_SECKEYSEEDEXPAND, seed, seedbytes);
   st->algo->hash_index(st, HASHIDX_SECKEYSEEDEXPAND_PI_INV);
@@ -379,16 +380,20 @@ void pkpsig_symmetric_expand_pi_inv(struct pkpsig_scratch_store *st, struct pkps
   memset(st->vecbuf, 0, n*4);
 };
 
-void pkpsig_symmetric_seckeychecksum(struct pkpsig_scratch_store *st, struct pkpsig_keysecret *key, uint8_t *outbuf) {
+void pkpsig_symmetric_expand_pubparamseed_from_seckeyseed(struct pkpsig_scratch_store *st, struct pkpsig_keysecret *key, const uint8_t *seed) {
   const struct pkpsig_paramset *ps = key->pub.kp.ps;
-  size_t pkblob_bytes = pkpsig_paramset_get_pkblob_bytes(ps);
-  uint8_t params[2] = { ps->seclevel_keypair->preimage_bytes,
-                        ps->seclevel_keypair->crhash_bytes };
+  size_t n = ps->pkpparams->n;
+  size_t seedbytes = ps->keyfmt->bytes_seckeyseed;
 
-  st->algo->hash_init(st, HASHCTX_SECKEYCHECKSUM, params, 2);
-  st->algo->hash_chunk(st, key->pub.pkblob, pkblob_bytes);
+  st->algo->hash_init(st, HASHCTX_SECKEYSEEDEXPAND, seed, seedbytes);
+  st->algo->hash_index(st, HASHIDX_SECKEYSEEDEXPAND_PUBPARAMSSEED);
 
-  st->algo->expand(st, outbuf, ps->keyfmt->bytes_seckeychecksum);
+  st->algo->expand(st, key->pub.pkblob, ps->keyfmt->bytes_pubparamseed);
+
+  /* erase secrets */
+  pkpsig_scratch_store_zero_algo_state(st);
+  memset(st->outputbuf, 0, n*4);
+  memset(st->vecbuf, 0, n*4);
 };
 
 void pkpsig_symmetric_gen_msghash_salt(struct pkpsig_sigstate *sst, const uint8_t *message, size_t messagelen) {
@@ -398,7 +403,7 @@ void pkpsig_symmetric_gen_msghash_salt(struct pkpsig_sigstate *sst, const uint8_
   struct pkpsig_chunk chunks[3] =
     { { &ctx, 1 },
       { message, messagelen },
-      { sst->key->skblob + keyfmt->bytes_pubparamseed + keyfmt->bytes_seckeyseed,
+      { sst->key->skblob + keyfmt->bytes_seckeyseed,
         keyfmt->bytes_saltgenseed } };
 
   sst->st->algo->XOF_chunked_input(sst->st, sst->salt_and_msghash, ps->seclevel_keypair->crhash_bytes, chunks, 3);
@@ -443,7 +448,7 @@ static int expand_blindingseed(struct pkpsig_scratch_store *st, const struct pkp
 void pkpsig_symmetric_gen_blindingseeds(struct pkpsig_sigstate *sst) {
   struct pkpsig_scratch_store *st = sst->st;
   const struct pkpsig_paramset *ps = sst->pub->kp.ps;
-  size_t pubsecseeds_bytes = ps->keyfmt->bytes_pubparamseed + ps->keyfmt->bytes_seckeyseed;
+  size_t pubsecseeds_bytes = ps->keyfmt->bytes_seckeyseed;
   size_t key_preimage_bytes = ps->seclevel_keypair->preimage_bytes;
   size_t key_crhash_bytes = ps->seclevel_keypair->crhash_bytes;
   size_t sig_crhash_bytes = ps->seclevel_signature->crhash_bytes;

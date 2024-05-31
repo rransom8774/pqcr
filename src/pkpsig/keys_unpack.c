@@ -20,38 +20,31 @@
 #include <string.h>
 
 /* used by both keygen and signing */
-int pkpsig_key_unpack_skblob_internal(struct pkpsig_scratch_store *st, struct pkpsig_keysecret *key, int set_checksum) {
+int pkpsig_key_unpack_skblob_internal(struct pkpsig_scratch_store *st, struct pkpsig_keysecret *key) {
   const struct pkpsig_keyfmt *keyfmt = key->pub.kp.ps->keyfmt;
-  uint8_t *skblob_checksum = key->skblob + (keyfmt->bytes_pubparamseed +
-                                            keyfmt->bytes_seckeyseed +
-                                            keyfmt->bytes_saltgenseed);
   size_t n = key->pub.kp.ps->pkpparams->n;
   size_t m = key->pub.kp.ps->pkpparams->m;
   size_t i;
-  union {
-    uint8_t checksum[256];
-    uint16_t v_pi[128];
-  } x;
+  uint16_t *v_pi = (uint16_t *)(st->tmpbuf);
 
   /* avoid stack overflow */
   if (st->ps != key->pub.kp.ps) abort();
   if (st->ps->pkpparams->n > 128) abort();
-  if (st->ps->keyfmt->bytes_seckeychecksum > 256) abort();
 
   /* fill in the public key seed */
-  memcpy(key->pub.pkblob, key->skblob, keyfmt->bytes_pubparamseed);
+  pkpsig_symmetric_expand_pubparamseed_from_seckeyseed(st, key, key->skblob);
 
   /* unpack public params */
   for (i = 0; i < n; ++i) key->pub.kp.v[i] = pqcr_modulus_modulo(&(key->pub.kp.ps->pkpparams->q), i);
-  pkpsig_symmetric_expand_A(st, &(key->pub.kp), key->skblob);
+  pkpsig_symmetric_expand_A(st, &(key->pub.kp), key->pub.pkblob);
 
   /* unpack secret key */
   pkpsig_symmetric_expand_pi_inv(st, key, key->skblob);
 
   /* recover public key from secret key */
   pkpsig_permute_prepare(st);
-  pkpsig_permute_apply_inv(st, x.v_pi, key->pub.kp.v, key->pi_inv);
-  pkpsig_mult_vec_by_A(st, &(key->pub.kp), key->pub.u, x.v_pi);
+  pkpsig_permute_apply_inv(st, v_pi, key->pub.kp.v, key->pi_inv);
+  pkpsig_mult_vec_by_A(st, &(key->pub.kp), key->pub.u, v_pi);
 
   /* fill in the public key vector */
   for (i = 0; i < m; ++i) st->vecbuf[i] = key->pub.u[i];
@@ -60,32 +53,13 @@ int pkpsig_key_unpack_skblob_internal(struct pkpsig_scratch_store *st, struct pk
                         st->vecbuf);
 
   /* try to clear the buffer */
-  memset(x.v_pi, 0, 128 * sizeof(uint16_t));
-  /* The popular open-source compilers with too many chefs in the
-     kitchen will try to "optimize out" attempts to erase memory like
-     the memset above.  Aliasing the checksum output buffer, used
-     below by a function in another source file, onto the secret
-     vector may help. */
+  memset(v_pi, 0, n * sizeof(uint16_t));
 
-  /* regenerate checksum */
-  pkpsig_symmetric_seckeychecksum(st, key, x.checksum);
-
-  if (set_checksum) {
-    /* write the checksum into key->skblob */
-    memcpy(skblob_checksum, x.checksum, keyfmt->bytes_seckeychecksum);
-    return 0;
-  } else {
-    /* check the checksum in key->skblob */
-    if (memcmp(skblob_checksum, x.checksum, keyfmt->bytes_seckeychecksum) == 0) {
-      return 0;
-    } else {
-      return -1;
-    };
-  };
+  return 0;
 };
 
 int pkpsig_key_unpack_skblob(struct pkpsig_scratch_store *st, struct pkpsig_keysecret *key) {
-  return pkpsig_key_unpack_skblob_internal(st, key, 0);
+  return pkpsig_key_unpack_skblob_internal(st, key);
 };
 
 int pkpsig_key_unpack_pkblob(struct pkpsig_scratch_store *st, struct pkpsig_keypublic *pub) {
