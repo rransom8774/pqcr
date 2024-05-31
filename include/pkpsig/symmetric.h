@@ -55,7 +55,7 @@ int pkpsig_symmetric_algo_enumerate_names(pkpsig_symmetric_algo_enumerate_names_
 const char *pkpsig_symmetric_algo_name(const struct pkpsig_symmetric_algo *algo);
 const char *pkpsig_symmetric_algo_ui_name_short(const struct pkpsig_symmetric_algo *algo);
 const char *pkpsig_symmetric_algo_ui_name_long(const struct pkpsig_symmetric_algo *algo);
- size_t pkpsig_symmetric_algo_state_bytes(const struct pkpsig_symmetric_algo *algo);
+size_t pkpsig_symmetric_algo_state_bytes(const struct pkpsig_symmetric_algo *algo);
 int pkpsig_symmetric_algo_check_seclevel(const struct pkpsig_symmetric_algo *algo, int preimage_bytes, int crhash_bytes);
 
 struct pkpsig_scratch_store *pkpsig_scratch_store_new(const struct pkpsig_symmetric_algo *algo);
